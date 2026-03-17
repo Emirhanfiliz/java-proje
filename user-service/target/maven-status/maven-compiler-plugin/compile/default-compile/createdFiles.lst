@@ -1,0 +1,8 @@
+com\sporttracker\userservice\repository\UserRepository.class
+com\sporttracker\userservice\service\UserService.class
+com\sporttracker\userservice\dto\LoginRequest.class
+com\sporttracker\userservice\dto\RegisterRequest.class
+com\sporttracker\userservice\model\User.class
+com\sporttracker\userservice\UserServiceApplication.class
+com\sporttracker\userservice\service\UserServiceImpl.class
+com\sporttracker\userservice\controller\AuthController.class
