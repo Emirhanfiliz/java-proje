@@ -1,29 +1,42 @@
 package com.sporttracker.shared.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> {
 
     private boolean success;
     private String message;
     private T data;
+    private int statusCode; // Eklenti: HTTP durum kodlarını da dönebilmek için
 
-    public ApiResponse() {}
-
-    public ApiResponse(boolean success,String message,T data){
-        this.success = success;
-        this.message = message;
-        this.data = data;
+    // Başarılı işlemler için hızlı build metodları
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message(message)
+                .data(data)
+                .statusCode(200)
+                .build();
     }
 
-    public boolean isSuccess() {
-        return success;
+    public static <T> ApiResponse<T> success(T data) {
+        return success(data, "Operation successful");
     }
 
-    public String getMessage() {
-        return message;
+    // Hatalı işlemler için
+    public static <T> ApiResponse<T> error(String message, int statusCode) {
+        return ApiResponse.<T>builder()
+                .success(false)
+                .message(message)
+                .data(null)
+                .statusCode(statusCode)
+                .build();
     }
-
-    public T getData() {
-        return data;
-    }
-
 }

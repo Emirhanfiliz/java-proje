@@ -13,10 +13,10 @@
     <description>User service for Sport Tracker System</description>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version> <!-- En güncel Spring Boot -->
-        <relativePath/> 
+        <groupId>com.sporttracker</groupId>
+        <artifactId>sport-tracker-system</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -24,6 +24,12 @@
     </properties>
 
     <dependencies>
+        <!-- Shared Library -->
+        <dependency>
+            <groupId>com.sporttracker</groupId>
+            <artifactId>shared-library</artifactId>
+        </dependency>
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
