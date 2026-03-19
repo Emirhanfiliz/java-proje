@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * Controller katmanında fırlatılan TÜM hataları yakalayan (Catch) Merkezi Yakalayıcı (Interceptor).
- * Hocanın Merkezi Hata Yönetimi (+5 Puan) isteğini karşılar.
  * Projeyi çökmekten kurtarır, kullanıcıya daima JSON ApiResponse döner.
  */
 @Slf4j

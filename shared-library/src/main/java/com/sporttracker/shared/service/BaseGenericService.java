@@ -3,13 +3,10 @@ package com.sporttracker.shared.service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Temel Servis Operasyonlarını (CRUD) içeren Generic Arayüz.
- * Tüm servislerde tekrarlanan (save, delete, findById) metodlarının her servise yeniden yazılmasını önler.
- *
- * @param <T>  Entity objesi
- * @param <ID> Benzersiz Kimlik
- */
+
+  @param <T>  Entity objesi
+  @param <ID> Benzersiz Kimlik
+
 public interface BaseGenericService<T, ID> {
 
     T save(T entity);
