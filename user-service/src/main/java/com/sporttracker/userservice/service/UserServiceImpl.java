@@ -1,5 +1,6 @@
 package com.sporttracker.userservice.service;
 
+import com.sporttracker.userservice.cache.UserCacheService;
 import com.sporttracker.userservice.dto.LoginRequest;
 import com.sporttracker.userservice.dto.LoginResponse;
 import com.sporttracker.userservice.dto.RegisterRequest;
@@ -16,6 +17,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserCacheService userCacheService;
 
     @Override
     public User register(RegisterRequest request) {
@@ -24,12 +26,14 @@ public class UserServiceImpl implements UserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        userCacheService.evict(saved.getEmail());
+        return saved;
     }
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userCacheService.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
