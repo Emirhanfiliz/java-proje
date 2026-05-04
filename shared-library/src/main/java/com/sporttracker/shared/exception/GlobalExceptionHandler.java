@@ -4,8 +4,11 @@ import com.sporttracker.shared.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
 
 /**
  * Controller katmanında fırlatılan TÜM hataları yakalayan (Catch) Merkezi Yakalayıcı (Interceptor).
@@ -16,6 +19,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     // Kendi tanımladığımız bilindik iş kuralları (Mesela "Kullanıcı Bulunamadı")
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        ApiResponse<Object> response = ApiResponse.error(message, HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(CustomBusinessException.class)
     public ResponseEntity<ApiResponse<Object>> handleCustomBusinessException(CustomBusinessException ex) {
         log.error("Business Exception Occurred: {}", ex.getMessage());

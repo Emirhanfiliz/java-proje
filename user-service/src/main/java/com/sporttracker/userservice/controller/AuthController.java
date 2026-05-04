@@ -1,5 +1,8 @@
 package com.sporttracker.userservice.controller;
 
+import com.sporttracker.shared.response.ApiResponse;
+import com.sporttracker.userservice.dto.LoginRequest;
+import com.sporttracker.userservice.dto.LoginResponse;
 import com.sporttracker.userservice.dto.RegisterRequest;
 import com.sporttracker.userservice.model.User;
 import com.sporttracker.userservice.service.UserService;
@@ -16,7 +19,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request) {
-        return userService.register(request);
+    public ApiResponse<User> register(@RequestBody RegisterRequest request) {
+        return ApiResponse.success(userService.register(request), "User registered successfully");
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request) {
+        return ApiResponse.success(userService.login(request), "Login successful");
     }
 }

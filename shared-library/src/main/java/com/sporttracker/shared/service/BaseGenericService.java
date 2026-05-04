@@ -3,10 +3,10 @@ package com.sporttracker.shared.service;
 import java.util.List;
 import java.util.Optional;
 
-
-  @param <T>  Entity objesi
-  @param <ID> Benzersiz Kimlik
-
+/**
+ * @param <T>  entity type
+ * @param <ID> identifier type
+ */
 public interface BaseGenericService<T, ID> {
 
     T save(T entity);

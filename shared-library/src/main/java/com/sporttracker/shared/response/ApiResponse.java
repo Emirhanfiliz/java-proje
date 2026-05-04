@@ -14,9 +14,8 @@ public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
-    private int statusCode; // Eklenti: HTTP durum kodlarını da dönebilmek için
+    private int statusCode;
 
-    // Başarılı işlemler için hızlı build metodları
     public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .success(true)
@@ -30,7 +29,6 @@ public class ApiResponse<T> {
         return success(data, "Operation successful");
     }
 
-    // Hatalı işlemler için
     public static <T> ApiResponse<T> error(String message, int statusCode) {
         return ApiResponse.<T>builder()
                 .success(false)

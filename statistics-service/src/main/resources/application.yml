@@ -1,0 +1,17 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: statistics-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sport_tracker_statistics
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+# Eureka/Gateway config (later)
