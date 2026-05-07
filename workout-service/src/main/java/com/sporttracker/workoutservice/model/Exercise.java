@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Exercise {
+
     private String name;
     private Integer sets;
     private Integer reps;
     private Double weight;
     private Integer durationInSeconds;
+    private String notes;
 }

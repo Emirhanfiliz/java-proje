@@ -2,6 +2,7 @@ package com.sporttracker.workoutservice.dto;
 
 import com.sporttracker.workoutservice.model.Exercise;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,13 +17,18 @@ import java.util.List;
 @AllArgsConstructor
 public class WorkoutCreateRequest {
 
-    @NotBlank(message = "userId is required")
+    @NotBlank
     private String userId;
 
-    @NotBlank(message = "name is required")
+    @NotBlank
     private String name;
 
     private String description;
+    
     private LocalDateTime date;
+
+    @NotNull
+    private Integer durationInMinutes;
+
     private List<Exercise> exercises;
 }

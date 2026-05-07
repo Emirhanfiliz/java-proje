@@ -23,7 +23,12 @@ public class WorkoutServiceImpl implements WorkoutService {
 
     @Override
     public List<Workout> listByUserId(String userId) {
-        return workoutRepository.findByUserId(userId);
+        return workoutRepository.findByUserIdOrderByDateDesc(userId);
+    }
+
+    @Override
+    public List<Workout> listByUserIdAndDateRange(String userId, LocalDateTime start, LocalDateTime end) {
+        return workoutRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, start, end);
     }
 
     @Override
@@ -43,6 +48,7 @@ public class WorkoutServiceImpl implements WorkoutService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .date(when)
+                .durationInMinutes(request.getDurationInMinutes())
                 .exercises(exercises)
                 .build();
         return workoutRepository.save(workout);
