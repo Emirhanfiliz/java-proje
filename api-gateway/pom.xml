@@ -16,9 +16,33 @@
     <description>Spring Cloud Gateway for Sport Tracker System</description>
 
     <dependencies>
+        <!-- Spring Cloud Gateway (WebFlux tabanlı - reaktif) -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- Shared Library - sadece JWT ve ortak sınıflar için
+             spring-boot-starter-web exclude edilmeli; Gateway WebFlux kullanır -->
+        <dependency>
+            <groupId>com.sporttracker</groupId>
+            <artifactId>shared-library</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-validation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Spring Security Reactive (WebFlux için) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- Lombok -->

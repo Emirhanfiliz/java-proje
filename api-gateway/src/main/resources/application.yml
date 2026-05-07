@@ -21,3 +21,8 @@ spring:
           uri: http://localhost:8083
           predicates:
             - Path=/api/v1/statistics/**
+
+jwt:
+  secret-key: "sport-tracker-super-secret-key-must-be-at-least-256-bits-long!"
+  access-token-expiration-ms: 900000
+  refresh-token-expiration-ms: 604800000
