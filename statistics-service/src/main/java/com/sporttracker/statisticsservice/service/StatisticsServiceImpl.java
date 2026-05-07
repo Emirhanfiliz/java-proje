@@ -1,5 +1,8 @@
 package com.sporttracker.statisticsservice.service;
 
+import com.sporttracker.shared.dto.WorkoutDto;
+import com.sporttracker.shared.response.ApiResponse;
+import com.sporttracker.statisticsservice.client.WorkoutClient;
 import com.sporttracker.statisticsservice.dto.StatisticCreateRequest;
 import com.sporttracker.statisticsservice.model.Statistic;
 import com.sporttracker.statisticsservice.repository.StatisticRepository;
@@ -12,9 +15,11 @@ import java.util.List;
 public class StatisticsServiceImpl implements StatisticsService {
 
     private final StatisticRepository statisticRepository;
+    private final WorkoutClient workoutClient;
 
-    public StatisticsServiceImpl(StatisticRepository statisticRepository) {
+    public StatisticsServiceImpl(StatisticRepository statisticRepository, WorkoutClient workoutClient) {
         this.statisticRepository = statisticRepository;
+        this.workoutClient = workoutClient;
     }
 
     @Override
@@ -39,5 +44,16 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<Statistic> listAll() {
         return statisticRepository.findAll();
+    }
+
+    @Override
+    public Double calculateTotalDuration(String userId) {
+        ApiResponse<List<WorkoutDto>> response = workoutClient.listWorkoutsByUser(userId);
+        if (response.isSuccess() && response.getData() != null) {
+            return response.getData().stream()
+                    .mapToDouble(w -> w.getDurationInMinutes() != null ? w.getDurationInMinutes() : 0.0)
+                    .sum();
+        }
+        return 0.0;
     }
 }

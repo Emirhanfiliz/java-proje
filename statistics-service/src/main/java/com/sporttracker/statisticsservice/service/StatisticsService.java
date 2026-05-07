@@ -12,4 +12,6 @@ public interface StatisticsService {
     List<Statistic> listByUserId(String userId);
 
     List<Statistic> listAll();
+
+    Double calculateTotalDuration(String userId);
 }

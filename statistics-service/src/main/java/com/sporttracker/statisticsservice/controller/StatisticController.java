@@ -33,4 +33,9 @@ public class StatisticController {
     public ApiResponse<List<Statistic>> listAll() {
         return ApiResponse.success(statisticsService.listAll());
     }
+
+    @GetMapping("/user/{userId}/calculate-duration")
+    public ApiResponse<Double> calculateTotalDuration(@PathVariable String userId) {
+        return ApiResponse.success(statisticsService.calculateTotalDuration(userId), "Total duration calculated");
+    }
 }

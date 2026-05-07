@@ -16,7 +16,7 @@ public class Statistic implements BaseEntity<Long> {
     
     private Long id;
     private String userId;
-    private String type; // e.g., "CALORIE_BURNED", "WORKOUT_DURATION"
+    private String type;
     private Double value;
     private LocalDateTime calculationDate;
 
