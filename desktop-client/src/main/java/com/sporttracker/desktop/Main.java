@@ -9,7 +9,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         ViewManager.setPrimaryStage(primaryStage);
-        ViewManager.loadView("dashboard");
+        ViewManager.loadView("login");
         primaryStage.setTitle("Sport Tracker");
         primaryStage.show();
     }
