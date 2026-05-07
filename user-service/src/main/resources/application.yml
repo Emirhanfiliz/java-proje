@@ -11,7 +11,7 @@ spring:
       host: localhost
       port: 6379
 
-# JWT Config
 jwt:
-  secret: 9a4f2c8d3b7e1f6a5c8d2e4b9a1f3g5h7i9j2k4l6m8n0p2q4r6s8t0u2v4w6x8y
-  expiration: 86400000 
+  secret-key: "sport-tracker-super-secret-key-must-be-at-least-256-bits-long!"
+  access-token-expiration-ms: 900000
+  refresh-token-expiration-ms: 604800000
