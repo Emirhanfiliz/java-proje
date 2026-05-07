@@ -4,20 +4,37 @@ import javafx.geometry.Insets?>
 import javafx.scene.chart.CategoryAxis?>
 import javafx.scene.chart.LineChart?>
 import javafx.scene.chart.NumberAxis?>
+import javafx.scene.control.Button?>
 import javafx.scene.control.Label?>
+import javafx.scene.control.ListView?>
+import javafx.scene.layout.HBox?>
 import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.DashboardController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.DashboardController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-    <Label fx:id="welcomeLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Yükleniyor..." />
-    <LineChart fx:id="statisticsChart" prefHeight="400.0" prefWidth="600.0" title="Haftalık Antrenman Süresi">
-      <xAxis>
-        <CategoryAxis side="BOTTOM" />
-      </xAxis>
-      <yAxis>
-        <NumberAxis side="LEFT" />
-      </yAxis>
-    </LineChart>
+
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Label fx:id="welcomeLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Yükleniyor..." />
+        <Button onAction="#handleNewWorkout" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Yeni Antrenman Ekle" />
+    </HBox>
+
+    <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+        <VBox prefWidth="300.0" spacing="10.0">
+            <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Son Antrenmanlar" />
+            <ListView fx:id="workoutListView" VBox.vgrow="ALWAYS" />
+        </VBox>
+
+        <VBox VBox.vgrow="ALWAYS">
+            <LineChart fx:id="statisticsChart" prefHeight="400.0" prefWidth="450.0" title="Haftalık Antrenman Süresi">
+                <xAxis>
+                    <CategoryAxis side="BOTTOM" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis side="LEFT" />
+                </yAxis>
+            </LineChart>
+        </VBox>
+    </HBox>
 </VBox>
