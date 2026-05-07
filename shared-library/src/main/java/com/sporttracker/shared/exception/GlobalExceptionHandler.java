@@ -10,15 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
-/**
- * Controller katmanında fırlatılan TÜM hataları yakalayan (Catch) Merkezi Yakalayıcı (Interceptor).
- * Projeyi çökmekten kurtarır, kullanıcıya daima JSON ApiResponse döner.
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Kendi tanımladığımız bilindik iş kuralları (Mesela "Kullanıcı Bulunamadı")
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()
@@ -35,7 +30,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
-    // Beklenmedik "NullPointer, IndexOutOfBounds" vb Tüm Diğer Hatalar - (500 Internal Server Error)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
         log.error("Unhandled Exception Occurred!", ex);
