@@ -253,3 +253,31 @@
     -fx-background-radius: 8;
     -fx-padding: 6 12 6 12;
 }
+
+/* ── Mobile Step Counter Theme — Commit 22 ─────────────────────── */
+
+.step-counter-card {
+    -fx-background-color: linear-gradient(to right, #3494E6, #EC6EAD);
+    -fx-background-radius: 16;
+    -fx-padding: 16 20 16 20;
+    -fx-effect: dropshadow(gaussian, rgba(52,148,230,0.4), 12, 0, 0, 4);
+}
+
+.step-icon {
+    -fx-font-size: 42px;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
+
+.step-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgba(255,255,255,0.85);
+}
+
+.step-count {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);
+}

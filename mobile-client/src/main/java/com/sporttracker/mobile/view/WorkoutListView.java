@@ -5,6 +5,7 @@ import com.gluonhq.charm.glisten.control.CharmListView;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.google.gson.reflect.TypeToken;
 import com.sporttracker.mobile.service.MobileApiService;
+import com.sporttracker.mobile.service.StepCounterService;
 import com.sporttracker.mobile.session.MobileSessionManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -42,13 +43,15 @@ public class WorkoutListView extends View {
         listView.setCellFactory(p -> new WorkoutListCell());
         listView.getStyleClass().add("workout-list");
 
+        HBox stepCard = buildStepCounterCard();
+
         Button addBtn = new Button("+ Antrenman Ekle");
         addBtn.getStyleClass().add("primary-button");
         addBtn.setMaxWidth(Double.MAX_VALUE);
         addBtn.setPrefHeight(50);
         addBtn.setOnAction(e -> getApplication().switchView(com.sporttracker.mobile.MobileApp.ADD_WORKOUT_VIEW));
 
-        VBox content = new VBox(12, spinner, statusLabel, listView, addBtn);
+        VBox content = new VBox(12, stepCard, spinner, statusLabel, listView, addBtn);
         content.setAlignment(Pos.TOP_CENTER);
         content.setPadding(new Insets(16));
         VBox.setVgrow(listView, Priority.ALWAYS);
@@ -75,6 +78,28 @@ public class WorkoutListView extends View {
             getApplication().switchView(com.sporttracker.mobile.MobileApp.HOME_VIEW);
         });
         appBar.getActionItems().setAll(logoutBtn);
+    }
+
+    private HBox buildStepCounterCard() {
+        HBox card = new HBox(16);
+        card.getStyleClass().add("step-counter-card");
+        card.setAlignment(Pos.CENTER_LEFT);
+
+        Label icon = new Label("👟");
+        icon.getStyleClass().add("step-icon");
+
+        VBox textBox = new VBox(4);
+        Label title = new Label("Bugünkü Adımlar");
+        title.getStyleClass().add("step-title");
+        
+        Label countLabel = new Label("0");
+        countLabel.getStyleClass().add("step-count");
+        countLabel.textProperty().bind(StepCounterService.getInstance().stepCountProperty().asString("%,d"));
+
+        textBox.getChildren().addAll(title, countLabel);
+        card.getChildren().addAll(icon, textBox);
+
+        return card;
     }
 
     private void loadWorkouts() {
