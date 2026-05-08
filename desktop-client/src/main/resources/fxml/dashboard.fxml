@@ -1,44 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-import javafx.geometry.Insets?>
-import javafx.scene.chart.CategoryAxis?>
-import javafx.scene.chart.LineChart?>
-import javafx.scene.chart.NumberAxis?>
-import javafx.scene.control.Button?>
-import javafx.scene.control.Label?>
-import javafx.scene.control.ListView?>
-import javafx.scene.layout.HBox?>
-import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.DashboardController">
+<VBox alignment="TOP_CENTER" prefHeight="620.0" prefWidth="860.0" spacing="14.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.sporttracker.desktop.controller.DashboardController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
     </padding>
 
-    <HBox alignment="CENTER_LEFT" spacing="20.0">
-        <Label fx:id="welcomeLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Yükleniyor..." />
-        <Button onAction="#handleNewWorkout" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="Yeni Antrenman Ekle" />
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label fx:id="welcomeLabel" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Yükleniyor..." HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleNewWorkout" styleClass="button-success" text="+ Antrenman Ekle" />
+        <Button onAction="#handleLogout" styleClass="button-danger" text="Çıkış" />
     </HBox>
 
+    <!-- Status / Loading -->
+    <HBox alignment="CENTER_LEFT" spacing="8.0">
+        <ProgressIndicator fx:id="loadingIndicator" prefHeight="22.0" prefWidth="22.0" visible="false" />
+        <Label fx:id="statusLabel" style="-fx-text-fill: #aaa; -fx-font-size: 12px;" text="" />
+    </HBox>
+
+    <!-- Main content -->
     <HBox spacing="20.0" VBox.vgrow="ALWAYS">
-        <VBox prefWidth="300.0" spacing="10.0">
-            <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Son Antrenmanlar" />
+
+        <!-- Workout list -->
+        <VBox prefWidth="310.0" spacing="8.0">
+            <Label style="-fx-font-weight: bold; -fx-font-size: 15px;" text="Son Antrenmanlar" />
             <ListView fx:id="workoutListView" VBox.vgrow="ALWAYS" />
         </VBox>
 
-        <VBox VBox.vgrow="ALWAYS" spacing="10.0">
-            <LineChart fx:id="statisticsChart" prefHeight="300.0" prefWidth="450.0" title="Haftalık Antrenman Süresi">
-                <xAxis>
-                    <CategoryAxis side="BOTTOM" />
-                </xAxis>
-                <yAxis>
-                    <NumberAxis side="LEFT" />
-                </yAxis>
+        <!-- Chart + progress -->
+        <VBox HBox.hgrow="ALWAYS" spacing="10.0">
+            <LineChart fx:id="statisticsChart" prefHeight="300.0" title="Haftalık Antrenman (dk)">
+                <xAxis><CategoryAxis side="BOTTOM" /></xAxis>
+                <yAxis><NumberAxis side="LEFT" /></yAxis>
             </LineChart>
-            <HBox alignment="CENTER" spacing="20.0">
-                <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Haftalık Şiddet Hedefi:" />
+            <HBox alignment="CENTER" spacing="16.0">
+                <Label style="-fx-font-weight: bold; -fx-font-size: 13px;" text="Haftalık Şiddet Hedefi:" />
                 <StackPane fx:id="circularProgressContainer" />
             </HBox>
         </VBox>
+
     </HBox>
 </VBox>

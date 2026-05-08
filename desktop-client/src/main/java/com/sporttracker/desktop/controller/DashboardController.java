@@ -1,7 +1,14 @@
 package com.sporttracker.desktop.controller;
 
+import com.google.gson.reflect.TypeToken;
+import com.sporttracker.desktop.api.ApiClient;
+import com.sporttracker.desktop.api.ApiResult;
+import com.sporttracker.desktop.api.dto.WorkoutDto;
+import com.sporttracker.desktop.session.SessionManager;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,47 +17,34 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class DashboardController {
+import java.lang.reflect.Type;
+import java.util.List;
 
-    @FXML
-    private Label welcomeLabel;
+public class DashboardController extends BaseController {
 
-    @FXML
-    private LineChart<String, Number> statisticsChart;
+    @FXML private Label                        welcomeLabel;
+    @FXML private LineChart<String, Number>    statisticsChart;
+    @FXML private ListView<String>             workoutListView;
+    @FXML private StackPane                    circularProgressContainer;
+    @FXML private ProgressIndicator            loadingIndicator;
+    @FXML private Label                        statusLabel;
 
-    @FXML
-    private ListView<String> workoutListView;
-
-    @FXML
-    private StackPane circularProgressContainer;
-
-    private ObservableList<String> workouts = FXCollections.observableArrayList();
+    private final ObservableList<String> workoutItems = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        welcomeLabel.setText("Sport Tracker Dashboard'a Hoş Geldiniz");
+        String username = SessionManager.getInstance().getUsername();
+        welcomeLabel.setText("Hoş geldin, " + (username != null ? username : "Kullanıcı") + "!");
 
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Dakika / Gün");
-        series.getData().add(new XYChart.Data<>("Pzt", 45));
-        series.getData().add(new XYChart.Data<>("Sal", 60));
-        series.getData().add(new XYChart.Data<>("Çar", 0));
-        series.getData().add(new XYChart.Data<>("Per", 90));
-        series.getData().add(new XYChart.Data<>("Cum", 45));
-        series.getData().add(new XYChart.Data<>("Cmt", 120));
-        series.getData().add(new XYChart.Data<>("Paz", 30));
-        statisticsChart.getData().add(series);
-
-        workouts.addAll("Göğüs & Arka Kol - 60 dk", "Sırt & Biceps - 50 dk", "Bacak - 70 dk");
-        workoutListView.setItems(workouts);
-
-        com.sporttracker.desktop.component.CircularProgressBar intensityBar = new com.sporttracker.desktop.component.CircularProgressBar(40, 8);
-        intensityBar.setProgress(65);
-        circularProgressContainer.getChildren().add(intensityBar);
+        workoutListView.setItems(workoutItems);
+        buildChart();
+        addProgressBar();
+        loadWorkoutsAsync();
     }
 
     @FXML
@@ -58,21 +52,94 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/workout_modal.fxml"));
             Parent root = loader.load();
-
             WorkoutModalController controller = loader.getController();
             controller.setDashboardController(this);
 
-            Stage modalStage = new Stage();
-            modalStage.setTitle("Yeni Antrenman");
-            modalStage.initModality(Modality.APPLICATION_MODAL);
-            modalStage.setScene(new Scene(root));
-            modalStage.showAndWait();
+            Stage modal = new Stage();
+            modal.setTitle("Yeni Antrenman");
+            modal.initModality(Modality.APPLICATION_MODAL);
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/css/dark-theme.css").toExternalForm());
+            modal.setScene(scene);
+            modal.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void addWorkout(String workoutSummary) {
-        workouts.add(0, workoutSummary);
+    @FXML
+    public void handleLogout() {
+        SessionManager.getInstance().logout();
+        navigateTo("login");
+    }
+
+    public void addWorkout(String summary) {
+        workoutItems.add(0, summary);
+    }
+
+    public void refreshWorkouts() {
+        loadWorkoutsAsync();
+    }
+
+    private void loadWorkoutsAsync() {
+        setLoading(true, "Antrenmanlar yükleniyor...");
+
+        String userId = SessionManager.getInstance().getUserId();
+        String token  = SessionManager.getInstance().getToken();
+
+        if (userId == null || token == null) {
+            setLoading(false, "Oturum bilgisi bulunamadı");
+            return;
+        }
+
+        Type listType = new TypeToken<List<WorkoutDto>>() {}.getType();
+
+        Task<ApiResult<List<WorkoutDto>>> task = new Task<>() {
+            @Override
+            protected ApiResult<List<WorkoutDto>> call() {
+                return ApiClient.get("/api/v1/workouts/user/" + userId, token, listType);
+            }
+        };
+
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            setLoading(false, "");
+            ApiResult<List<WorkoutDto>> result = task.getValue();
+            workoutItems.clear();
+            if (result.isSuccess() && result.getData() != null) {
+                result.getData().forEach(w -> workoutItems.add(w.toDisplayString()));
+                if (workoutItems.isEmpty()) showInfo(statusLabel, "Henüz antrenman kaydı yok");
+            } else {
+                showInfo(statusLabel, "Sunucu bağlantısı yok — çevrimdışı mod");
+            }
+        }));
+
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            setLoading(false, "Yükleme başarısız");
+        }));
+
+        new Thread(task, "workout-loader").start();
+    }
+
+    private void setLoading(boolean loading, String status) {
+        if (loadingIndicator != null) loadingIndicator.setVisible(loading);
+        if (statusLabel      != null) showInfo(statusLabel, status);
+    }
+
+    private void buildChart() {
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Dakika / Gün");
+        String[] days   = {"Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"};
+        int[]    values = {45, 60, 0, 90, 45, 120, 30};
+        for (int i = 0; i < days.length; i++) {
+            series.getData().add(new XYChart.Data<>(days[i], values[i]));
+        }
+        statisticsChart.getData().add(series);
+    }
+
+    private void addProgressBar() {
+        com.sporttracker.desktop.component.CircularProgressBar bar =
+                new com.sporttracker.desktop.component.CircularProgressBar(40, 8);
+        bar.setProgress(65);
+        circularProgressContainer.getChildren().add(bar);
     }
 }

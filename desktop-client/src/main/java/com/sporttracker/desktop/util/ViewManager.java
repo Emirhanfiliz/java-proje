@@ -25,7 +25,10 @@ public class ViewManager {
             FXMLLoader loader = new FXMLLoader(url);
             Parent root = loader.load();
             Scene scene = new Scene(root);
+            java.net.URL css = ViewManager.class.getResource("/css/dark-theme.css");
+            if (css != null) scene.getStylesheets().add(css.toExternalForm());
             primaryStage.setScene(scene);
+            primaryStage.sizeToScene();
         } catch (IOException e) {
             throw new RuntimeException("Error loading FXML", e);
         }
