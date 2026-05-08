@@ -5,9 +5,12 @@ import com.sporttracker.userservice.dto.LoginResponse;
 import com.sporttracker.userservice.dto.RegisterRequest;
 import com.sporttracker.userservice.model.User;
 import com.sporttracker.userservice.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,6 +39,20 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
+
+    private User storedUser;
+
+    @BeforeEach
+    void setUp() {
+        storedUser = User.builder()
+                .id("u1")
+                .email("emir@test.com")
+                .password("hashed123")
+                .build();
+    }
+
     // ── register ──────────────────────────────────────────────────────────────
 
     @Test
@@ -50,11 +67,13 @@ class UserServiceImplTest {
             return u;
         });
 
-        User result = userService.register(request);
+        userService.register(request);
 
-        assertThat(result.getPassword()).isEqualTo("hashed123");
-        verify(passwordEncoder).encode("raw123");
-        verify(userRepository).save(any(User.class));
+        verify(userRepository, times(1)).save(userCaptor.capture());
+        User captured = userCaptor.getValue();
+        assertThat(captured.getPassword()).isEqualTo("hashed123");
+        assertThat(captured.getEmail()).isEqualTo("emir@test.com");
+        verify(passwordEncoder, times(1)).encode("raw123");
     }
 
     @Test
@@ -65,10 +84,10 @@ class UserServiceImplTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encoded");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User result = userService.register(request);
+        userService.register(request);
 
-        // User.username field'ı (getUsername() değil, asıl alan)
-        assertThat(result.getEmail()).isEqualTo("emir@test.com");
+        verify(userRepository).save(userCaptor.capture());
+        assertThat(userCaptor.getValue().getEmail()).isEqualTo("emir@test.com");
     }
 
     @Test
@@ -79,9 +98,11 @@ class UserServiceImplTest {
         when(passwordEncoder.encode("secret")).thenReturn("$2a$encoded");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User result = userService.register(request);
+        userService.register(request);
 
-        assertThat(result.getPassword()).isNotEqualTo("secret");
+        verify(userRepository).save(userCaptor.capture());
+        assertThat(userCaptor.getValue().getPassword()).isNotEqualTo("secret");
+        assertThat(userCaptor.getValue().getPassword()).startsWith("$2a$");
     }
 
     // ── login ─────────────────────────────────────────────────────────────────
@@ -89,12 +110,6 @@ class UserServiceImplTest {
     @Test
     @DisplayName("login: geçerli email+şifre ile JWT token dönmeli")
     void login_shouldReturnTokenOnValidCredentials() {
-        User storedUser = User.builder()
-                .id("u1")
-                .email("emir@test.com")
-                .password("hashed123")
-                .build();
-
         LoginRequest request = new LoginRequest();
         request.setEmail("emir@test.com");
         request.setPassword("raw123");
@@ -107,6 +122,7 @@ class UserServiceImplTest {
 
         assertThat(response.getToken()).isEqualTo("jwt.token.here");
         assertThat(response.getEmail()).isEqualTo("emir@test.com");
+        verify(jwtService, times(1)).generateToken(storedUser);
     }
 
     @Test
@@ -121,17 +137,13 @@ class UserServiceImplTest {
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("User not found");
+
+        verify(jwtService, never()).generateToken(any());
     }
 
     @Test
     @DisplayName("login: yanlış şifre ile exception fırlatmalı")
     void login_shouldThrowWhenPasswordInvalid() {
-        User storedUser = User.builder()
-                .id("u1")
-                .email("emir@test.com")
-                .password("hashed123")
-                .build();
-
         LoginRequest request = new LoginRequest();
         request.setEmail("emir@test.com");
         request.setPassword("wrongpass");
@@ -147,18 +159,12 @@ class UserServiceImplTest {
     @Test
     @DisplayName("login: şifre yanlışsa JWT üretilmemeli")
     void login_shouldNotGenerateTokenOnInvalidPassword() {
-        User storedUser = User.builder()
-                .id("u1")
-                .email("emir@test.com")
-                .password("hashed")
-                .build();
-
         LoginRequest request = new LoginRequest();
         request.setEmail("emir@test.com");
         request.setPassword("wrong");
 
         when(userRepository.findByEmail("emir@test.com")).thenReturn(Optional.of(storedUser));
-        when(passwordEncoder.matches("wrong", "hashed")).thenReturn(false);
+        when(passwordEncoder.matches("wrong", "hashed123")).thenReturn(false);
 
         assertThatThrownBy(() -> userService.login(request)).isInstanceOf(RuntimeException.class);
 

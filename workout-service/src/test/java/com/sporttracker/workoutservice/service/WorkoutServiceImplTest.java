@@ -8,6 +8,8 @@ import com.sporttracker.workoutservice.repository.WorkoutRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +33,9 @@ class WorkoutServiceImplTest {
     @InjectMocks
     private WorkoutServiceImpl workoutService;
 
+    @Captor
+    private ArgumentCaptor<Workout> workoutCaptor;
+
     // ── create ────────────────────────────────────────────────────────────────
 
     @Test
@@ -45,10 +50,13 @@ class WorkoutServiceImplTest {
 
         when(workoutRepository.save(any(Workout.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Workout result = workoutService.create(request);
+        workoutService.create(request);
 
-        assertThat(result.getDate()).isEqualTo(fixedDate);
-        verify(workoutRepository).save(any(Workout.class));
+        verify(workoutRepository, times(1)).save(workoutCaptor.capture());
+        Workout captured = workoutCaptor.getValue();
+        assertThat(captured.getDate()).isEqualTo(fixedDate);
+        assertThat(captured.getUserId()).isEqualTo("u1");
+        assertThat(captured.getName()).isEqualTo("Morning Run");
     }
 
     @Test
@@ -63,9 +71,10 @@ class WorkoutServiceImplTest {
 
         when(workoutRepository.save(any(Workout.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Workout result = workoutService.create(request);
+        workoutService.create(request);
 
-        assertThat(result.getDate()).isAfter(before);
+        verify(workoutRepository).save(workoutCaptor.capture());
+        assertThat(workoutCaptor.getValue().getDate()).isAfter(before);
     }
 
     @Test
@@ -79,9 +88,10 @@ class WorkoutServiceImplTest {
 
         when(workoutRepository.save(any(Workout.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Workout result = workoutService.create(request);
+        workoutService.create(request);
 
-        assertThat(result.getExercises()).isNotNull().isEmpty();
+        verify(workoutRepository).save(workoutCaptor.capture());
+        assertThat(workoutCaptor.getValue().getExercises()).isNotNull().isEmpty();
     }
 
     @Test
@@ -99,10 +109,30 @@ class WorkoutServiceImplTest {
 
         when(workoutRepository.save(any(Workout.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Workout result = workoutService.create(request);
+        workoutService.create(request);
 
-        assertThat(result.getExercises()).hasSize(2);
-        assertThat(result.getExercises().get(0).getName()).isEqualTo("Push-up");
+        verify(workoutRepository).save(workoutCaptor.capture());
+        Workout captured = workoutCaptor.getValue();
+        assertThat(captured.getExercises()).hasSize(2);
+        assertThat(captured.getExercises().get(0).getName()).isEqualTo("Push-up");
+        assertThat(captured.getExercises().get(1).getName()).isEqualTo("Squat");
+    }
+
+    @Test
+    @DisplayName("create: durationInMinutes doğru aktarılmalı")
+    void create_shouldMapDurationInMinutes() {
+        WorkoutCreateRequest request = WorkoutCreateRequest.builder()
+                .userId("u1")
+                .name("HIIT")
+                .durationInMinutes(30)
+                .build();
+
+        when(workoutRepository.save(any(Workout.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        workoutService.create(request);
+
+        verify(workoutRepository).save(workoutCaptor.capture());
+        assertThat(workoutCaptor.getValue().getDurationInMinutes()).isEqualTo(30);
     }
 
     // ── getById ───────────────────────────────────────────────────────────────
@@ -117,6 +147,7 @@ class WorkoutServiceImplTest {
 
         assertThat(result.getId()).isEqualTo("w1");
         assertThat(result.getName()).isEqualTo("Run");
+        verify(workoutRepository, times(1)).findById("w1");
     }
 
     @Test
@@ -138,17 +169,19 @@ class WorkoutServiceImplTest {
                 Workout.builder().id("w1").userId("u1").name("Run").build(),
                 Workout.builder().id("w2").userId("u1").name("Swim").build()
         );
-        when(workoutRepository.findByUserId("u1")).thenReturn(workouts);
+        when(workoutRepository.findByUserIdOrderByDateDesc("u1")).thenReturn(workouts);
 
         List<Workout> result = workoutService.listByUserId("u1");
 
         assertThat(result).hasSize(2);
+        assertThat(result).allMatch(w -> "u1".equals(w.getUserId()));
+        verify(workoutRepository, times(1)).findByUserIdOrderByDateDesc("u1");
     }
 
     @Test
     @DisplayName("listByUserId: kayıt yoksa boş liste dönmeli")
     void listByUserId_shouldReturnEmptyListWhenNoWorkouts() {
-        when(workoutRepository.findByUserId("u2")).thenReturn(Collections.emptyList());
+        when(workoutRepository.findByUserIdOrderByDateDesc("u2")).thenReturn(Collections.emptyList());
 
         List<Workout> result = workoutService.listByUserId("u2");
 
@@ -164,7 +197,8 @@ class WorkoutServiceImplTest {
 
         workoutService.delete("w1");
 
-        verify(workoutRepository).deleteById("w1");
+        verify(workoutRepository, times(1)).deleteById("w1");
+        verify(workoutRepository, times(1)).existsById("w1");
     }
 
     @Test
