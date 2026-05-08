@@ -10,6 +10,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -23,6 +24,9 @@ public class DashboardController {
 
     @FXML
     private ListView<String> workoutListView;
+
+    @FXML
+    private StackPane circularProgressContainer;
 
     private ObservableList<String> workouts = FXCollections.observableArrayList();
 
@@ -43,6 +47,10 @@ public class DashboardController {
 
         workouts.addAll("Göğüs & Arka Kol - 60 dk", "Sırt & Biceps - 50 dk", "Bacak - 70 dk");
         workoutListView.setItems(workouts);
+
+        com.sporttracker.desktop.component.CircularProgressBar intensityBar = new com.sporttracker.desktop.component.CircularProgressBar(40, 8);
+        intensityBar.setProgress(65);
+        circularProgressContainer.getChildren().add(intensityBar);
     }
 
     @FXML
