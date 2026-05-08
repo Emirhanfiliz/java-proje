@@ -195,3 +195,61 @@
 .list-cell:hover {
     -fx-background-color: #202040;
 }
+
+/* ── Mobile Workout List Theme — Commit 21 ─────────────────────── */
+
+/* === Workout List View === */
+.workout-list-view {
+    -fx-background-color: #0f0f1a;
+}
+
+.workout-list {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-control-inner-background-alt: transparent;
+    -fx-padding: 0;
+}
+
+.workout-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 8 0 8 0; /* Hücreler arası dokunmatik boşluk */
+    -fx-border-color: transparent;
+}
+
+/* === Workout Card === */
+.workout-card {
+    -fx-background-color: #1a1a2e;
+    -fx-background-radius: 16;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 0, 4);
+    -fx-min-height: 100;
+    -fx-cursor: hand;
+}
+
+.workout-list .list-cell:selected .workout-card {
+    -fx-background-color: #2a2a50;
+    -fx-border-color: #6c63ff;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+}
+
+.workout-card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.workout-card-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #9090b0;
+    -fx-padding: 4 0 8 0;
+}
+
+.workout-card-detail {
+    -fx-font-size: 13px;
+    -fx-text-fill: #d0d0e8;
+    -fx-font-weight: bold;
+    -fx-background-color: #252540;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+}
