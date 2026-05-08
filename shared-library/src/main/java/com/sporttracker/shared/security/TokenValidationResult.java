@@ -1,33 +1,31 @@
 package com.sporttracker.shared.security;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-
-@Getter
-@Builder
-@ToString
-@AllArgsConstructor
 public class TokenValidationResult {
 
     private final boolean valid;
-    private final String errorCode;
-    private final String errorMessage;
+    private final String  errorCode;
+    private final String  errorMessage;
+
+    public TokenValidationResult(boolean valid, String errorCode, String errorMessage) {
+        this.valid        = valid;
+        this.errorCode    = errorCode;
+        this.errorMessage = errorMessage;
+    }
 
     public static TokenValidationResult valid() {
-        return TokenValidationResult.builder()
-                .valid(true)
-                .errorCode(null)
-                .errorMessage(null)
-                .build();
+        return new TokenValidationResult(true, null, null);
     }
 
     public static TokenValidationResult invalid(String errorCode, String errorMessage) {
-        return TokenValidationResult.builder()
-                .valid(false)
-                .errorCode(errorCode)
-                .errorMessage(errorMessage)
-                .build();
+        return new TokenValidationResult(false, errorCode, errorMessage);
+    }
+
+    public boolean isValid()         { return valid; }
+    public String  getErrorCode()    { return errorCode; }
+    public String  getErrorMessage() { return errorMessage; }
+
+    @Override
+    public String toString() {
+        return "TokenValidationResult{valid=" + valid + ", errorCode='" + errorCode + "', errorMessage='" + errorMessage + "'}";
     }
 }

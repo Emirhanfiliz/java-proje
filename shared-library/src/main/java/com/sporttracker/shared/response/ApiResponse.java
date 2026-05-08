@@ -1,28 +1,23 @@
 package com.sporttracker.shared.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ApiResponse<T> {
 
     private boolean success;
-    private String message;
-    private T data;
-    private int statusCode;
+    private String  message;
+    private T       data;
+    private int     statusCode;
+
+    public ApiResponse() {}
+
+    public ApiResponse(boolean success, String message, T data, int statusCode) {
+        this.success    = success;
+        this.message    = message;
+        this.data       = data;
+        this.statusCode = statusCode;
+    }
 
     public static <T> ApiResponse<T> success(T data, String message) {
-        return ApiResponse.<T>builder()
-                .success(true)
-                .message(message)
-                .data(data)
-                .statusCode(200)
-                .build();
+        return new ApiResponse<>(true, message, data, 200);
     }
 
     public static <T> ApiResponse<T> success(T data) {
@@ -30,11 +25,16 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> error(String message, int statusCode) {
-        return ApiResponse.<T>builder()
-                .success(false)
-                .message(message)
-                .data(null)
-                .statusCode(statusCode)
-                .build();
+        return new ApiResponse<>(false, message, null, statusCode);
     }
+
+    public boolean isSuccess()    { return success; }
+    public String  getMessage()   { return message; }
+    public T       getData()      { return data; }
+    public int     getStatusCode(){ return statusCode; }
+
+    public void setSuccess(boolean success)     { this.success    = success; }
+    public void setMessage(String message)      { this.message    = message; }
+    public void setData(T data)                 { this.data       = data; }
+    public void setStatusCode(int statusCode)   { this.statusCode = statusCode; }
 }

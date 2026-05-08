@@ -7,8 +7,8 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class JwtTokenProvider {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     public static final String CLAIM_USER_ID    = "userId";
     public static final String CLAIM_EMAIL      = "email";
@@ -32,6 +32,10 @@ public class JwtTokenProvider {
     public static final String TOKEN_TYPE_REFRESH = "REFRESH";
 
     private final JwtProperties jwtProperties;
+
+    public JwtTokenProvider(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
 
     public String generateAccessToken(String userId, String email, String role) {
         Map<String, Object> claims = buildClaims(userId, email, role, TOKEN_TYPE_ACCESS);
@@ -78,33 +82,18 @@ public class JwtTokenProvider {
         }
     }
 
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public String extractUserId(String token) {
-        return extractClaim(token, claims -> claims.get(CLAIM_USER_ID, String.class));
-    }
-
-    public String extractRole(String token) {
-        return extractClaim(token, claims -> claims.get(CLAIM_ROLE, String.class));
-    }
-
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
+    public String extractEmail(String token)  { return extractClaim(token, Claims::getSubject); }
+    public String extractUserId(String token) { return extractClaim(token, c -> c.get(CLAIM_USER_ID, String.class)); }
+    public String extractRole(String token)   { return extractClaim(token, c -> c.get(CLAIM_ROLE, String.class)); }
+    public Date   extractExpiration(String token) { return extractClaim(token, Claims::getExpiration); }
 
     public boolean isTokenExpired(String token) {
-        try {
-            return extractExpiration(token).before(new Date());
-        } catch (ExpiredJwtException ex) {
-            return true;
-        }
+        try { return extractExpiration(token).before(new Date()); }
+        catch (ExpiredJwtException ex) { return true; }
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = parseAllClaims(token);
-        return claimsResolver.apply(claims);
+    public <T> T extractClaim(String token, Function<Claims, T> resolver) {
+        return resolver.apply(parseAllClaims(token));
     }
 
     private Map<String, Object> buildClaims(String userId, String email, String role, String tokenType) {
@@ -116,13 +105,13 @@ public class JwtTokenProvider {
         return claims;
     }
 
-    private String buildToken(String subject, Map<String, Object> extraClaims, long expirationMs) {
-        long nowMs = System.currentTimeMillis();
+    private String buildToken(String subject, Map<String, Object> extra, long expirationMs) {
+        long now = System.currentTimeMillis();
         return Jwts.builder()
-                .claims(extraClaims)
+                .claims(extra)
                 .subject(subject)
-                .issuedAt(new Date(nowMs))
-                .expiration(new Date(nowMs + expirationMs))
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + expirationMs))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -136,7 +125,7 @@ public class JwtTokenProvider {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        byte[] key = jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(key);
     }
 }

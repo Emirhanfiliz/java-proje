@@ -1,9 +1,7 @@
 package com.sporttracker.shared.exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-@Getter
 public class CustomBusinessException extends RuntimeException {
 
     private final HttpStatus httpStatus;
@@ -13,4 +11,7 @@ public class CustomBusinessException extends RuntimeException {
         this.httpStatus = httpStatus;
     }
 
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
 }
