@@ -4,7 +4,7 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.sporttracker.mobile.service.MobileApiService;
 import com.sporttracker.mobile.session.MobileSessionManager;
-import com.sporttracker.mobile.util.MobileLoginValidator;
+import com.sporttracker.shared.util.AuthValidator;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -183,7 +183,7 @@ public class LoginView extends View {
         String email    = emailField.getText().trim();
         String password = passwordField.getText();
 
-        String validationError = MobileLoginValidator.validate(email, password);
+        String validationError = AuthValidator.validateLogin(email, password);
         if (validationError != null) {
             errorLabel.setText(validationError);
             shakeField(validationError.contains("mail") ? emailField : passwordField);

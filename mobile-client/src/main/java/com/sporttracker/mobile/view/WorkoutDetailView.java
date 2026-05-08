@@ -3,7 +3,7 @@ package com.sporttracker.mobile.view;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.sporttracker.mobile.session.MobileSessionManager;
-import com.sporttracker.mobile.util.CalorieCalculator;
+import com.sporttracker.shared.util.CalorieCalculator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

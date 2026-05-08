@@ -14,6 +14,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 
+import com.sporttracker.shared.util.AuthValidator;
+
 public class LoginController extends BaseController {
 
     @FXML private TextField         emailField;
@@ -28,9 +30,11 @@ public class LoginController extends BaseController {
         String email    = emailField.getText().trim();
         String password = passwordField.getText();
 
-        if (email.isEmpty()) { showError(errorLabel, "Email boş bırakılamaz"); return; }
-        if (!email.contains("@")) { showError(errorLabel, "Geçerli bir email giriniz"); return; }
-        if (password.isEmpty()) { showError(errorLabel, "Şifre boş bırakılamaz"); return; }
+        String validationError = AuthValidator.validateLogin(email, password);
+        if (validationError != null) {
+            showError(errorLabel, validationError);
+            return;
+        }
 
         setLoading(true);
 
