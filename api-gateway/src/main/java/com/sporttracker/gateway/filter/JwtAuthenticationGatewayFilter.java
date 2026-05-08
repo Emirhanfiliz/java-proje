@@ -4,8 +4,8 @@ import com.sporttracker.shared.security.JwtProperties;
 import com.sporttracker.shared.security.JwtTokenProvider;
 import com.sporttracker.shared.security.JwtUtil;
 import com.sporttracker.shared.security.TokenValidationResult;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -20,13 +20,17 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 @EnableConfigurationProperties(JwtProperties.class)
 public class JwtAuthenticationGatewayFilter implements GlobalFilter, Ordered {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationGatewayFilter.class);
+
     private final JwtTokenProvider jwtTokenProvider;
+
+    public JwtAuthenticationGatewayFilter(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     private static final List<String> OPEN_PATHS = List.of(
             "/auth/login",
