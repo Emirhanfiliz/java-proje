@@ -14,4 +14,10 @@ public interface StatisticsService {
     List<Statistic> listAll();
 
     Double calculateTotalDuration(String userId);
+
+    double calculateAverageValueByType(String userId, String type);
+
+    double calculateMaxValueByType(String userId, String type);
+
+    long countByType(String userId, String type);
 }

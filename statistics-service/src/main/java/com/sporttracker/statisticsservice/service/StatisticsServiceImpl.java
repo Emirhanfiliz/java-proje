@@ -47,6 +47,21 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
+    public double calculateAverageValueByType(String userId, String type) {
+        return 0.0;
+    }
+
+    @Override
+    public double calculateMaxValueByType(String userId, String type) {
+        return 0.0;
+    }
+
+    @Override
+    public long countByType(String userId, String type) {
+        return 0L;
+    }
+
+    @Override
     public Double calculateTotalDuration(String userId) {
         ApiResponse<List<WorkoutDto>> response = workoutClient.listWorkoutsByUser(userId);
         if (response.isSuccess() && response.getData() != null) {
