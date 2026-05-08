@@ -48,17 +48,27 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public double calculateAverageValueByType(String userId, String type) {
-        return 0.0;
+        return statisticRepository.findByUserId(userId).stream()
+                .filter(s -> type.equals(s.getType()))
+                .mapToDouble(Statistic::getValue)
+                .average()
+                .orElse(0.0);
     }
 
     @Override
     public double calculateMaxValueByType(String userId, String type) {
-        return 0.0;
+        return statisticRepository.findByUserId(userId).stream()
+                .filter(s -> type.equals(s.getType()))
+                .mapToDouble(Statistic::getValue)
+                .max()
+                .orElse(0.0);
     }
 
     @Override
     public long countByType(String userId, String type) {
-        return 0L;
+        return statisticRepository.findByUserId(userId).stream()
+                .filter(s -> type.equals(s.getType()))
+                .count();
     }
 
     @Override
