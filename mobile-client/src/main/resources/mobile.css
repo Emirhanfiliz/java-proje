@@ -212,8 +212,7 @@
 
 .workout-list .list-cell {
     -fx-background-color: transparent;
-    -fx-padding: 8 0 8 0; /* Hücreler arası dokunmatik boşluk */
-    -fx-border-color: transparent;
+    -fx-padding: 8 0 8 0;
 }
 
 /* === Workout Card === */
@@ -280,4 +279,62 @@
     -fx-font-weight: bold;
     -fx-text-fill: #ffffff;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);
+}
+
+/* ── Mobile Workout Detail Theme — Commit 24 ─────────────────────── */
+
+.workout-detail-view {
+    -fx-background-color: #0f0f1a;
+}
+
+.detail-card {
+    -fx-background-color: #1a1a2e;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 20, 0, 0, 8);
+    -fx-max-width: 360;
+}
+
+.detail-icon-circle {
+    -fx-fill: linear-gradient(to bottom right, #ff9a9e, #fecfef);
+    -fx-effect: dropshadow(gaussian, rgba(255,154,158,0.4), 10, 0, 0, 4);
+}
+
+.detail-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.detail-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #a0a0c0;
+}
+
+.detail-stat {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d0d0e8;
+    -fx-background-color: #252540;
+    -fx-background-radius: 12;
+    -fx-padding: 8 16 8 16;
+}
+
+.calorie-box {
+    -fx-background-color: linear-gradient(to right, #ff758c, #ff7eb3);
+    -fx-background-radius: 16;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(255,117,140,0.4), 12, 0, 0, 4);
+    -fx-min-width: 240;
+}
+
+.calorie-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(255,255,255,0.9);
+}
+
+.calorie-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
 }

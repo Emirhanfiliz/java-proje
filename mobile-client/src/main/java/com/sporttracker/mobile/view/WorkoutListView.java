@@ -58,6 +58,14 @@ public class WorkoutListView extends View {
 
         setCenter(content);
 
+        listView.selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                MobileSessionManager.getInstance().setSelectedWorkout(newVal);
+                getApplication().switchView(com.sporttracker.mobile.MobileApp.WORKOUT_DETAIL_VIEW);
+                Platform.runLater(() -> listView.getSelectionModel().clearSelection());
+            }
+        });
+
         showingProperty().addListener((obs, wasShowing, isShowing) -> {
             if (isShowing) loadWorkouts();
         });

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.Base64;
+import java.util.Map;
 
 public class MobileSessionManager {
 
@@ -13,6 +14,8 @@ public class MobileSessionManager {
     private String username;
     private String email;
     private String userId;
+    
+    private Map<String, Object> selectedWorkout;
 
     private MobileSessionManager() {}
 
@@ -33,7 +36,7 @@ public class MobileSessionManager {
     }
 
     public void logout() {
-        token = null; username = null; email = null; userId = null;
+        token = null; username = null; email = null; userId = null; selectedWorkout = null;
     }
 
     public boolean isLoggedIn()   { return token != null && !token.isEmpty(); }
@@ -41,6 +44,9 @@ public class MobileSessionManager {
     public String  getUsername()  { return username; }
     public String  getEmail()     { return email; }
     public String  getUserId()    { return userId; }
+
+    public Map<String, Object> getSelectedWorkout() { return selectedWorkout; }
+    public void setSelectedWorkout(Map<String, Object> selectedWorkout) { this.selectedWorkout = selectedWorkout; }
 
     private String extractUserIdFromToken(String jwt) {
         try {
