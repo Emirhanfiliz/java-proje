@@ -7,3 +7,10 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/workout_service_db
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
