@@ -1,0 +1,77 @@
+/* ── Mobile Dark Theme ──────────────────────────────────── */
+.root {
+    -fx-background-color: #1a1a2e;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.title-label {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.subtitle-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #aaaaaa;
+}
+
+.status-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #888888;
+}
+
+.error-label {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}
+
+.text-field, .password-field {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #666;
+    -fx-padding: 12 14 12 14;
+    -fx-font-size: 14px;
+    -fx-pref-width: 220;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #007bff;
+}
+
+.primary-button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #0056b3;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #007bff;
+    -fx-border-color: transparent;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.list-cell {
+    -fx-background-color: #16213e;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 14 16 14 16;
+    -fx-font-size: 14px;
+    -fx-border-color: transparent transparent #0f3460 transparent;
+}
+
+.list-cell:selected {
+    -fx-background-color: #0f3460;
+}
