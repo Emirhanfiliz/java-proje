@@ -7,6 +7,7 @@ import com.sporttracker.statisticsservice.dto.StatisticCreateRequest;
 import com.sporttracker.statisticsservice.model.Statistic;
 import com.sporttracker.statisticsservice.repository.StatisticRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,12 +73,25 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
+    @Transactional
     public Double calculateTotalDuration(String userId) {
         ApiResponse<List<WorkoutDto>> response = workoutClient.listWorkoutsByUser(userId);
         if (response.isSuccess() && response.getData() != null) {
-            return response.getData().stream()
+            double totalDuration = response.getData().stream()
                     .mapToDouble(w -> w.getDurationInMinutes() != null ? w.getDurationInMinutes() : 0.0)
                     .sum();
+                    
+            // Veri tutarlılığı kontrolü: NoSQL'den gelen veriyi JDBC katmanına senkronize et (Upsert mantığı)
+            Statistic stat = statisticRepository.findByUserId(userId).stream()
+                    .filter(s -> "TOTAL_DURATION".equals(s.getType()))
+                    .findFirst()
+                    .orElse(Statistic.builder().userId(userId).type("TOTAL_DURATION").build());
+                    
+            stat.setValue(totalDuration);
+            stat.setCalculationDate(LocalDateTime.now());
+            statisticRepository.save(stat);
+            
+            return totalDuration;
         }
         return 0.0;
     }
