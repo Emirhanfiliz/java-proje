@@ -43,11 +43,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        User user = userCacheService.findByEmail(request.getEmail())
-                .orElseThrow(() -> new CustomBusinessException(
-                        "Kullanıcı bulunamadı: " + request.getEmail(),
-                        HttpStatus.NOT_FOUND
-                ));
+        User user = userCacheService.findByEmail(request.getEmail());
+        if (user == null) {
+            throw new CustomBusinessException(
+                    "Kullanıcı bulunamadı: " + request.getEmail(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomBusinessException("Şifre hatalı", HttpStatus.UNAUTHORIZED);

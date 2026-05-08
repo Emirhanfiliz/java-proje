@@ -1,5 +1,6 @@
 package com.sporttracker.userservice.service;
 
+import com.sporttracker.userservice.cache.UserCacheService;
 import com.sporttracker.userservice.dto.LoginRequest;
 import com.sporttracker.userservice.dto.LoginResponse;
 import com.sporttracker.userservice.dto.RegisterRequest;
@@ -15,8 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,6 +34,9 @@ class UserServiceImplTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private UserCacheService userCacheService;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -114,7 +116,7 @@ class UserServiceImplTest {
         request.setEmail("emir@test.com");
         request.setPassword("raw123");
 
-        when(userRepository.findByEmail("emir@test.com")).thenReturn(Optional.of(storedUser));
+        when(userCacheService.findByEmail("emir@test.com")).thenReturn(storedUser);
         when(passwordEncoder.matches("raw123", "hashed123")).thenReturn(true);
         when(jwtService.generateToken(storedUser)).thenReturn("jwt.token.here");
 
@@ -132,11 +134,11 @@ class UserServiceImplTest {
         request.setEmail("ghost@test.com");
         request.setPassword("pass");
 
-        when(userRepository.findByEmail("ghost@test.com")).thenReturn(Optional.empty());
+        when(userCacheService.findByEmail("ghost@test.com")).thenReturn(null);
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("User not found");
+                .hasMessageContaining("ghost@test.com");
 
         verify(jwtService, never()).generateToken(any());
     }
@@ -148,12 +150,12 @@ class UserServiceImplTest {
         request.setEmail("emir@test.com");
         request.setPassword("wrongpass");
 
-        when(userRepository.findByEmail("emir@test.com")).thenReturn(Optional.of(storedUser));
+        when(userCacheService.findByEmail("emir@test.com")).thenReturn(storedUser);
         when(passwordEncoder.matches("wrongpass", "hashed123")).thenReturn(false);
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Invalid password");
+                .hasMessageContaining("Şifre hatalı");
     }
 
     @Test
@@ -163,7 +165,7 @@ class UserServiceImplTest {
         request.setEmail("emir@test.com");
         request.setPassword("wrong");
 
-        when(userRepository.findByEmail("emir@test.com")).thenReturn(Optional.of(storedUser));
+        when(userCacheService.findByEmail("emir@test.com")).thenReturn(storedUser);
         when(passwordEncoder.matches("wrong", "hashed123")).thenReturn(false);
 
         assertThatThrownBy(() -> userService.login(request)).isInstanceOf(RuntimeException.class);

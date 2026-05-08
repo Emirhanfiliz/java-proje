@@ -1,5 +1,7 @@
 package com.sporttracker.userservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sporttracker.shared.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "users")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements BaseEntity<String>, UserDetails {
 
     @Id
@@ -36,24 +39,30 @@ public class User implements BaseEntity<String>, UserDetails {
     private String role = "ROLE_USER";
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
+    @JsonIgnore
     public String getUsername() {
         return email;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired()     { return true; }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked()      { return true; }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled()               { return true; }
 }

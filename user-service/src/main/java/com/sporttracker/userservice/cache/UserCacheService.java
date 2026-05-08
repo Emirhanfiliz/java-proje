@@ -7,17 +7,15 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserCacheService {
 
     private final UserRepository userRepository;
 
-    @Cacheable(value = "users", key = "#email")
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @Cacheable(value = "users", key = "#email", unless = "#result == null")
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @CacheEvict(value = "users", key = "#email")
