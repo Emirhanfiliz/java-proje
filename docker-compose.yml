@@ -1,39 +1,126 @@
+version: '3.8'
+
 services:
+
+  # ── Altyapı Servisleri ────────────────────────────────────────────────────
+
   mongodb:
-    image: mongo:latest
+    image: mongo:7.0
     container_name: sport-tracker-mongodb
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-
-  postgres:
-    image: postgres:15
-    container_name: sport-tracker-postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: sport_tracker_statistics
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
-    image: redis:latest
+    image: redis:7.2-alpine
     container_name: sport-tracker-redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  adminer:
-    image: adminer:latest
-    container_name: sport-tracker-adminer
+  postgres:
+    image: postgres:16-alpine
+    container_name: sport-tracker-postgres
     ports:
-      - "8080:8080"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: sport_tracker_statistics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Mikroservisler ────────────────────────────────────────────────────────
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: sport-tracker-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/user_service_db
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     depends_on:
-      - postgres
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  workout-service:
+    build:
+      context: .
+      dockerfile: workout-service/Dockerfile
+    container_name: sport-tracker-workout-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/workout_service_db
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  statistics-service:
+    build:
+      context: .
+      dockerfile: statistics-service/Dockerfile
+    container_name: sport-tracker-statistics-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sport_tracker_statistics
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: sport-tracker-api-gateway
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_CLOUD_GATEWAY_ROUTES[0]_ID: user-service
+      SPRING_CLOUD_GATEWAY_ROUTES[0]_URI: http://user-service:8081
+      SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]: Path=/auth/**
+      SPRING_CLOUD_GATEWAY_ROUTES[1]_ID: workout-service
+      SPRING_CLOUD_GATEWAY_ROUTES[1]_URI: http://workout-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES[1]_PREDICATES[0]: Path=/api/v1/workouts/**
+      SPRING_CLOUD_GATEWAY_ROUTES[2]_ID: statistics-service
+      SPRING_CLOUD_GATEWAY_ROUTES[2]_URI: http://statistics-service:8083
+      SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]: Path=/api/v1/statistics/**
+    depends_on:
+      - user-service
+      - workout-service
+      - statistics-service
 
 volumes:
   mongodb_data:
+  redis_data:
   postgres_data:
