@@ -14,7 +14,7 @@ import java.time.Duration;
 
 public class ApiClient {
 
-    private static final String     BASE_URL = "http://localhost:8080";
+    private static final String     BASE_URL = "http://localhost:8084";
     private static final HttpClient HTTP     = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
