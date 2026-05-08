@@ -1,32 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-import javafx.geometry.Insets?>
-import javafx.scene.control.Button?>
-import javafx.scene.control.Label?>
-import javafx.scene.control.PasswordField?>
-import javafx.scene.control.TextField?>
-import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="400.0" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.LoginController">
+<VBox alignment="CENTER" prefHeight="420.0" prefWidth="400.0" spacing="14.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.sporttracker.desktop.controller.LoginController">
     <padding>
-        <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
+        <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
     </padding>
 
-    <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Sport Tracker Giriş" />
-    
-    <Label fx:id="errorLabel" textFill="RED" />
+    <Label style="-fx-font-size: 26px; -fx-font-weight: bold;" text="Sport Tracker" />
+    <Label style="-fx-font-size: 13px; -fx-text-fill: #aaa;" text="Hesabınıza giriş yapın" />
+
+    <Label fx:id="errorLabel" text="" wrapText="true" />
 
     <VBox spacing="5.0">
         <Label text="Email" />
-        <TextField fx:id="emailField" promptText="Email adresiniz" />
+        <TextField fx:id="emailField" promptText="ornek@mail.com" />
     </VBox>
 
     <VBox spacing="5.0">
         <Label text="Şifre" />
-        <PasswordField fx:id="passwordField" promptText="Şifreniz" />
+        <PasswordField fx:id="passwordField" promptText="••••••••" />
     </VBox>
 
-    <Button onAction="#handleLogin" prefWidth="200.0" text="Giriş Yap" />
-    
-    <Button onAction="#handleGoToRegister" style="-fx-background-color: transparent; -fx-text-fill: blue; -fx-cursor: hand;" text="Hesabınız yok mu? Kayıt Ol" />
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="loginButton" onAction="#handleLogin" prefWidth="180.0" text="Giriş Yap" />
+        <ProgressIndicator fx:id="loadingIndicator" prefHeight="28.0" prefWidth="28.0" visible="false" />
+    </HBox>
+
+    <Button onAction="#handleGoToRegister" styleClass="button-link" text="Hesabınız yok mu? Kayıt Ol" />
 </VBox>

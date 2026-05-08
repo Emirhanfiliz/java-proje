@@ -1,0 +1,160 @@
+/* ── Root ───────────────────────────────────────────────── */
+.root {
+    -fx-background-color: #1a1a2e;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ── Labels ─────────────────────────────────────────────── */
+.label {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* ── Text inputs ─────────────────────────────────────────── */
+.text-field,
+.password-field {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #666;
+    -fx-padding: 8 12 8 12;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #007bff;
+    -fx-effect: dropshadow(gaussian, #007bff44, 6, 0, 0, 0);
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+
+.button:hover {
+    -fx-background-color: #0056b3;
+}
+
+.button:pressed {
+    -fx-background-color: #004094;
+}
+
+.button-success {
+    -fx-background-color: #28a745;
+}
+
+.button-success:hover {
+    -fx-background-color: #1e7e34;
+}
+
+.button-danger {
+    -fx-background-color: #dc3545;
+}
+
+.button-danger:hover {
+    -fx-background-color: #bd2130;
+}
+
+.button-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #007bff;
+    -fx-border-color: transparent;
+    -fx-padding: 4 8 4 8;
+}
+
+.button-link:hover {
+    -fx-text-fill: #0056b3;
+    -fx-background-color: transparent;
+}
+
+/* ── ListView ────────────────────────────────────────────── */
+.list-view {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 13px;
+}
+
+.list-cell:odd {
+    -fx-background-color: #1e2a45;
+}
+
+.list-cell:selected {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #ffffff;
+}
+
+.list-cell:hover {
+    -fx-background-color: #0f3460;
+    -fx-opacity: 0.85;
+}
+
+/* ── Charts ──────────────────────────────────────────────── */
+.chart {
+    -fx-background-color: #16213e;
+    -fx-padding: 10;
+}
+
+.chart-plot-background {
+    -fx-background-color: #1a1a2e;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: #2a2a4a;
+}
+
+.chart-series-line {
+    -fx-stroke: #007bff;
+    -fx-stroke-width: 2.5px;
+}
+
+.chart-line-symbol {
+    -fx-background-color: #007bff, white;
+}
+
+.chart-title {
+    -fx-text-fill: #e0e0e0;
+}
+
+.axis {
+    -fx-tick-label-fill: #aaaaaa;
+}
+
+.axis-label {
+    -fx-text-fill: #aaaaaa;
+}
+
+/* ── Progress indicator ──────────────────────────────────── */
+.progress-indicator .percentage {
+    -fx-fill: #007bff;
+}
+
+.progress-indicator .indicator {
+    -fx-border-color: #0f3460;
+    -fx-background-color: transparent;
+}
+
+/* ── Scroll bar ──────────────────────────────────────────── */
+.scroll-bar {
+    -fx-background-color: #16213e;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #0f3460;
+    -fx-background-radius: 4;
+}
