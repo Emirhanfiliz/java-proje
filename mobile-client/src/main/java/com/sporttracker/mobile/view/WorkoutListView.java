@@ -14,7 +14,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
+import com.gluonhq.charm.glisten.control.CharmListCell;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -62,7 +62,7 @@ public class WorkoutListView extends View {
             if (newVal != null) {
                 MobileSessionManager.getInstance().setSelectedWorkout(newVal);
                 getApplication().switchView(com.sporttracker.mobile.MobileApp.WORKOUT_DETAIL_VIEW);
-                Platform.runLater(() -> listView.getSelectionModel().clearSelection());
+                Platform.runLater(() -> listView.setSelectedItem(null));
             }
         });
 
@@ -147,7 +147,7 @@ public class WorkoutListView extends View {
         }, "mobile-load-workouts").start();
     }
 
-    private static class WorkoutListCell extends ListCell<Map<String, Object>> {
+    private static class WorkoutListCell extends CharmListCell<Map<String, Object>> {
         private final VBox card = new VBox();
         private final Label nameLabel = new Label();
         private final Label dateLabel = new Label();
@@ -177,7 +177,7 @@ public class WorkoutListView extends View {
         }
 
         @Override
-        protected void updateItem(Map<String, Object> item, boolean empty) {
+        public void updateItem(Map<String, Object> item, boolean empty) {
             super.updateItem(item, empty);
             if (empty || item == null) {
                 setGraphic(null);
