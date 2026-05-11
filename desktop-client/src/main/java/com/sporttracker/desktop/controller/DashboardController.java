@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sporttracker.desktop.api.ApiClient;
 import com.sporttracker.desktop.api.ApiResult;
 import com.sporttracker.desktop.api.dto.WorkoutDto;
+import com.sporttracker.desktop.session.DesktopProfileStore;
 import com.sporttracker.desktop.session.SessionManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -17,33 +18,69 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class DashboardController extends BaseController {
 
     @FXML private Label                        welcomeLabel;
+    @FXML private Label                        streakLabel;
     @FXML private LineChart<String, Number>    statisticsChart;
     @FXML private ListView<String>             workoutListView;
     @FXML private StackPane                    circularProgressContainer;
     @FXML private ProgressIndicator            loadingIndicator;
     @FXML private Label                        statusLabel;
+    @FXML private ProgressBar                  weeklyGoalBar;
+    @FXML private Label                        weeklyGoalLabel;
+    @FXML private Label                        hydrationLabel;
+    @FXML private Label                        weightLabel;
+    @FXML private Label                        bmiLabel;
+    @FXML private Label                        bmiBadgeLabel;
+    @FXML private Label                        activeMinutesLabel;
+    @FXML private Label                        caloriesLabel;
+    @FXML private Label                        distanceLabel;
+    @FXML private Label                        heartRateLabel;
+    @FXML private Label                        sleepLabel;
 
     private final ObservableList<String> workoutItems = FXCollections.observableArrayList();
+    private final List<String> lastSuccessfulWorkoutItems = new ArrayList<>();
+    private int hydrationCurrent = 0;
+    private final int hydrationTarget = 8;
+    private double currentWeight = 74.0;
+    private final double userHeightMeters = 1.75;
 
     @FXML
     public void initialize() {
-        String username = SessionManager.getInstance().getUsername();
-        welcomeLabel.setText("Hoş geldin, " + (username != null ? username : "Kullanıcı") + "!");
+        String username = formatDisplayName(
+                SessionManager.getInstance().getUsername(),
+                SessionManager.getInstance().getEmail()
+        );
+        DesktopProfileStore.ProfileData profile = DesktopProfileStore.load();
+        if (profile.displayName != null && !profile.displayName.isBlank()) {
+            username = profile.displayName;
+        }
+        if (profile.weightKg > 0) {
+            currentWeight = profile.weightKg;
+        }
+        welcomeLabel.setText("Merhaba, " + username + "!");
+        streakLabel.setText("🔥 " + (3 + new Random().nextInt(9)) + " Gün");
 
         workoutListView.setItems(workoutItems);
         buildChart();
         addProgressBar();
+        updateHydrationUI();
+        updateWeightBmiUI();
+        updatePerformancePulse();
+        updateWeeklyGoalsUI(0.35);
         loadWorkoutsAsync();
     }
 
@@ -71,6 +108,11 @@ public class DashboardController extends BaseController {
     public void handleLogout() {
         SessionManager.getInstance().logout();
         navigateTo("login");
+    }
+
+    @FXML
+    public void handleProfile() {
+        navigateTo("profile");
     }
 
     public void addWorkout(String summary) {
@@ -107,14 +149,35 @@ public class DashboardController extends BaseController {
             workoutItems.clear();
             if (result.isSuccess() && result.getData() != null) {
                 result.getData().forEach(w -> workoutItems.add(w.toDisplayString()));
+                lastSuccessfulWorkoutItems.clear();
+                lastSuccessfulWorkoutItems.addAll(
+                        result.getData().stream().map(WorkoutDto::toDisplayString).collect(Collectors.toList())
+                );
                 if (workoutItems.isEmpty()) showInfo(statusLabel, "Henüz antrenman kaydı yok");
+                updateWeeklyGoalsUI(Math.min(1.0, Math.max(0.2, workoutItems.size() / 6.0)));
             } else {
-                showInfo(statusLabel, "Sunucu bağlantısı yok — çevrimdışı mod");
+                if (!lastSuccessfulWorkoutItems.isEmpty()) {
+                    workoutItems.setAll(lastSuccessfulWorkoutItems);
+                    showInfo(statusLabel, "Sunucuya ulaşılamadı. Son senkronize veriler gösteriliyor.");
+                    updateWeeklyGoalsUI(Math.min(1.0, Math.max(0.2, workoutItems.size() / 6.0)));
+                } else {
+                    workoutItems.clear();
+                    showInfo(statusLabel, "Yerel mod aktif. Profil ve hedeflerini güncelleyebilirsin.");
+                    updateWeeklyGoalsUI(0.0);
+                }
             }
         }));
 
         task.setOnFailed(e -> Platform.runLater(() -> {
-            setLoading(false, "Yükleme başarısız");
+            if (!lastSuccessfulWorkoutItems.isEmpty()) {
+                setLoading(false, "Sunucuya ulaşılamadı. Son senkronize veriler gösteriliyor.");
+                workoutItems.setAll(lastSuccessfulWorkoutItems);
+                updateWeeklyGoalsUI(Math.min(1.0, Math.max(0.2, workoutItems.size() / 6.0)));
+            } else {
+                setLoading(false, "Yerel mod aktif. Profil ve hedeflerini güncelleyebilirsin.");
+                workoutItems.clear();
+                updateWeeklyGoalsUI(0.0);
+            }
         }));
 
         new Thread(task, "workout-loader").start();
@@ -141,5 +204,108 @@ public class DashboardController extends BaseController {
                 new com.sporttracker.desktop.component.CircularProgressBar(40, 8);
         bar.setProgress(65);
         circularProgressContainer.getChildren().add(bar);
+    }
+
+    private String formatDisplayName(String username, String email) {
+        String candidate = username;
+        if (candidate == null || candidate.isBlank()) {
+            candidate = email;
+        }
+        if (candidate == null || candidate.isBlank()) {
+            return "Sporcu";
+        }
+        candidate = candidate.trim();
+        if (candidate.contains("@")) {
+            int split = candidate.indexOf('@');
+            candidate = split > 0 ? candidate.substring(0, split) : "";
+        }
+        if (candidate.isBlank()) {
+            return "Sporcu";
+        }
+        return Character.toUpperCase(candidate.charAt(0)) + candidate.substring(1);
+    }
+
+    @FXML
+    public void handleHydrationIncrease() {
+        hydrationCurrent = Math.min(hydrationTarget, hydrationCurrent + 1);
+        updateHydrationUI();
+    }
+
+    @FXML
+    public void handleHydrationDecrease() {
+        hydrationCurrent = Math.max(0, hydrationCurrent - 1);
+        updateHydrationUI();
+    }
+
+    @FXML
+    public void handleWeightIncrease() {
+        currentWeight = Math.min(220.0, currentWeight + 0.5);
+        updateWeightBmiUI();
+    }
+
+    @FXML
+    public void handleWeightDecrease() {
+        currentWeight = Math.max(35.0, currentWeight - 0.5);
+        updateWeightBmiUI();
+    }
+
+    private void updateWeeklyGoalsUI(double progress) {
+        if (weeklyGoalBar == null || weeklyGoalLabel == null) return;
+        double clamped = Math.max(0.0, Math.min(1.0, progress));
+        int remaining = (int) Math.round((1.0 - clamped) * 100);
+        weeklyGoalBar.setProgress(clamped);
+        weeklyGoalLabel.setText("Haftalık hedefe %" + remaining + " kaldı");
+    }
+
+    private void updateHydrationUI() {
+        if (hydrationLabel != null) {
+            hydrationLabel.setText(hydrationCurrent + "/" + hydrationTarget + " Bardak");
+        }
+    }
+
+    private void updateWeightBmiUI() {
+        if (weightLabel == null || bmiLabel == null || bmiBadgeLabel == null) return;
+
+        double bmi = currentWeight / (userHeightMeters * userHeightMeters);
+        String badge;
+        String styleClass;
+        if (bmi < 18.5) {
+            badge = "Zayıf";
+            styleClass = "bmi-under-desktop";
+        } else if (bmi < 25.0) {
+            badge = "Normal";
+            styleClass = "bmi-normal-desktop";
+        } else {
+            badge = "Fazla Kilolu";
+            styleClass = "bmi-over-desktop";
+        }
+
+        bmiBadgeLabel.getStyleClass().removeAll("bmi-under-desktop", "bmi-normal-desktop", "bmi-over-desktop");
+        bmiBadgeLabel.getStyleClass().add(styleClass);
+        weightLabel.setText(String.format("%.1f kg", currentWeight));
+        bmiLabel.setText(String.format("BMI: %.1f", bmi));
+        bmiBadgeLabel.setText(badge);
+    }
+
+    private void updatePerformancePulse() {
+        String seedKey = SessionManager.getInstance().getUserId();
+        if (seedKey == null || seedKey.isBlank()) {
+            seedKey = SessionManager.getInstance().getUsername();
+        }
+        int seed = seedKey != null ? Math.abs(seedKey.hashCode()) : 17;
+        Random seededRandom = new Random(seed + java.time.LocalDate.now().toEpochDay());
+
+        int activeMinutes = 30 + seededRandom.nextInt(80);
+        int calories = 320 + seededRandom.nextInt(580);
+        double distance = 2.0 + seededRandom.nextDouble() * 8.5;
+        int heartRate = 54 + seededRandom.nextInt(24);
+        int sleepHours = 5 + seededRandom.nextInt(4);
+        int sleepMinutes = seededRandom.nextInt(6) * 10;
+
+        if (activeMinutesLabel != null) activeMinutesLabel.setText(activeMinutes + " dk");
+        if (caloriesLabel != null) caloriesLabel.setText(calories + " kcal");
+        if (distanceLabel != null) distanceLabel.setText(String.format("%.1f km", distance));
+        if (heartRateLabel != null) heartRateLabel.setText(heartRate + " bpm");
+        if (sleepLabel != null) sleepLabel.setText(String.format("%d sa %02d dk", sleepHours, sleepMinutes));
     }
 }

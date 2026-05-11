@@ -26,10 +26,18 @@ public class SessionManager {
     }
 
     public void login(String token, String username, String email) {
-        this.token    = token;
-        this.username = username;
-        this.email    = email;
-        this.userId   = extractUserIdFromToken(token);
+        this.token = token;
+        this.email = email;
+        this.userId = extractUserIdFromToken(token);
+
+        String usernameFromToken = extractUsernameFromToken(token);
+        if (usernameFromToken != null && !usernameFromToken.isBlank()) {
+            this.username = usernameFromToken;
+        } else if (username != null && !username.isBlank()) {
+            this.username = username;
+        } else {
+            this.username = email;
+        }
     }
 
     public void logout() {
@@ -50,10 +58,30 @@ public class SessionManager {
 
     private String extractUserIdFromToken(String jwt) {
         try {
-            String[] parts   = jwt.split("\\.");
-            byte[]   payload = Base64.getUrlDecoder().decode(parts[1]);
+            String[] parts = jwt.split("\\.");
+            byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
             JsonObject claims = JsonParser.parseString(new String(payload)).getAsJsonObject();
             return claims.has("userId") ? claims.get("userId").getAsString() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String extractUsernameFromToken(String jwt) {
+        try {
+            String[] parts = jwt.split("\\.");
+            byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
+            JsonObject claims = JsonParser.parseString(new String(payload)).getAsJsonObject();
+            String[] keys = {"username", "preferred_username", "name", "sub"};
+            for (String key : keys) {
+                if (claims.has(key) && !claims.get(key).isJsonNull()) {
+                    String value = claims.get(key).getAsString();
+                    if (value != null && !value.isBlank() && !value.contains("@")) {
+                        return value;
+                    }
+                }
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }

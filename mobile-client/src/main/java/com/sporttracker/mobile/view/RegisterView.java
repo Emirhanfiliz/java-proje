@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -43,7 +44,7 @@ public class RegisterView extends View {
         appBar.setVisible(false);
     }
 
-    private VBox buildLayout() {
+    private ScrollPane buildLayout() {
         VBox root = new VBox(0);
         root.setAlignment(Pos.TOP_CENTER);
         root.getStyleClass().add("login-root");
@@ -54,7 +55,11 @@ public class RegisterView extends View {
         VBox.setMargin(form, new Insets(-30, 0, 0, 0));
 
         root.getChildren().addAll(header, form);
-        return root;
+
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("auth-scroll");
+        return scrollPane;
     }
 
     private StackPane buildHeader() {
@@ -90,13 +95,15 @@ public class RegisterView extends View {
 
     private VBox buildForm() {
         VBox card = new VBox(12);
-        card.getStyleClass().add("login-card");
+        card.getStyleClass().addAll("login-card", "auth-card");
         card.setPadding(new Insets(24, 28, 24, 28));
         card.setMaxWidth(380);
         card.setAlignment(Pos.CENTER);
 
         Label formTitle = new Label("Yeni Hesap Oluştur");
         formTitle.getStyleClass().add("form-title");
+        Label formSubtitle = new Label("Dakikalar içinde başla ve gelişimini takip et");
+        formSubtitle.getStyleClass().add("auth-subtitle");
 
         VBox usernameBox = buildFieldGroup("Kullanıcı Adı", usernameField, "email-field");
         usernameField.setPromptText("Kullanıcı adınız");
@@ -138,6 +145,7 @@ public class RegisterView extends View {
 
         card.getChildren().addAll(
                 formTitle,
+                formSubtitle,
                 usernameBox,
                 emailBox,
                 passwordBox,
@@ -205,7 +213,7 @@ public class RegisterView extends View {
                 
                 Platform.runLater(() -> {
                     setLoading(false);
-                    errorLabel.setStyle("-fx-text-fill: #4CAF50;"); // Green for success
+                    errorLabel.getStyleClass().add("success-label");
                     errorLabel.setText("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
                     new Thread(() -> {
                         try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
@@ -214,8 +222,8 @@ public class RegisterView extends View {
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
-                    errorLabel.setStyle("-fx-text-fill: #ff4c4c;"); // Reset to red
-                    errorLabel.setText("Kayıt başarısız: " + ex.getMessage());
+                    errorLabel.getStyleClass().remove("success-label");
+                    errorLabel.setText(MobileApiService.toUserMessage(ex, "Kayıt tamamlanamadı. Lütfen tekrar deneyin."));
                     setLoading(false);
                 });
             }

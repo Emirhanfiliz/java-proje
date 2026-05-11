@@ -6,10 +6,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.lang.reflect.Type;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 
 public class ApiClient {
@@ -36,6 +38,7 @@ public class ApiClient {
         HttpRequest.Builder b = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + path))
                 .header("Content-Type", "application/json")
+                .timeout(Duration.ofSeconds(15))
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
         if (token != null) b.header("Authorization", "Bearer " + token);
         return b.build();
@@ -44,6 +47,7 @@ public class ApiClient {
     private static HttpRequest buildGet(String path, String token) {
         HttpRequest.Builder b = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + path))
+                .timeout(Duration.ofSeconds(15))
                 .GET();
         if (token != null) b.header("Authorization", "Bearer " + token);
         return b.build();
@@ -73,8 +77,10 @@ public class ApiClient {
                 data = GSON.fromJson(json.get("data"), dataType);
             }
             return new ApiResult<>(success, message, data, response.statusCode());
+        } catch (ConnectException | HttpTimeoutException e) {
+            return new ApiResult<>(false, "Sunucuya ulaşılamadı. Lütfen bağlantıyı kontrol edin.", null, 0);
         } catch (Exception e) {
-            return new ApiResult<>(false, "Sunucuya bağlanılamadı: " + e.getMessage(), null, 0);
+            return new ApiResult<>(false, "İstek işlenemedi. Lütfen tekrar deneyin.", null, 0);
         }
     }
 }

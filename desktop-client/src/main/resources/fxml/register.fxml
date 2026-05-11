@@ -7,14 +7,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="500.0" prefWidth="400.0" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.RegisterController">
+<VBox alignment="CENTER" prefHeight="500.0" prefWidth="400.0" spacing="15.0" styleClass="auth-page"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.RegisterController">
     <padding>
         <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
     </padding>
 
-    <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Sport Tracker Kayıt" />
+    <Label styleClass="app-title-desktop" text="Sport Tracker Kayıt" />
 
-    <Label fx:id="errorLabel" textFill="RED" />
+    <Label fx:id="errorLabel" styleClass="error-pill" />
 
     <VBox spacing="5.0">
         <Label text="Kullanıcı Adı" />
@@ -38,5 +39,5 @@
 
     <Button onAction="#handleRegister" prefWidth="200.0" text="Kayıt Ol" />
 
-    <Button onAction="#handleGoToLogin" style="-fx-background-color: transparent; -fx-text-fill: blue; -fx-cursor: hand;" text="Zaten hesabınız var mı? Giriş Yap" />
+    <Button onAction="#handleGoToLogin" styleClass="button-link" text="Zaten hesabınız var mı? Giriş Yap" />
 </VBox>

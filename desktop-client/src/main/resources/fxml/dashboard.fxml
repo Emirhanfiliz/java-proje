@@ -7,51 +7,129 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="620.0" prefWidth="860.0" spacing="14.0"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.sporttracker.desktop.controller.DashboardController">
-    <padding>
-        <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
-    </padding>
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" styleClass="dashboard-scroll"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.sporttracker.desktop.controller.DashboardController">
+    <content>
+        <VBox alignment="TOP_CENTER" prefHeight="620.0" prefWidth="860.0" spacing="14.0"
+              styleClass="dashboard-root">
+            <padding>
+                <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+            </padding>
 
-    <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label fx:id="welcomeLabel" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Yükleniyor..." HBox.hgrow="ALWAYS" />
-        <Button onAction="#handleNewWorkout" styleClass="button-success" text="+ Antrenman Ekle" />
-        <Button onAction="#handleLogout" styleClass="button-danger" text="Çıkış" />
-    </HBox>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label fx:id="welcomeLabel" styleClass="dashboard-welcome" text="Yükleniyor..." HBox.hgrow="ALWAYS" />
+                <Label fx:id="streakLabel" styleClass="streak-badge" text="🔥 0 Gün" />
+                <Button onAction="#handleProfile" styleClass="button-link" text="Profilim" />
+                <Button onAction="#handleNewWorkout" styleClass="button-success" text="+ Antrenman Ekle" />
+                <Button onAction="#handleLogout" styleClass="button-danger" text="Çıkış" />
+            </HBox>
 
-    <!-- Status / Loading -->
-    <HBox alignment="CENTER_LEFT" spacing="8.0">
-        <ProgressIndicator fx:id="loadingIndicator" prefHeight="22.0" prefWidth="22.0" visible="false" />
-        <Label fx:id="statusLabel" style="-fx-text-fill: #aaa; -fx-font-size: 12px;" text="" />
-    </HBox>
+            <!-- Status / Loading -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <ProgressIndicator fx:id="loadingIndicator" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                <Label fx:id="statusLabel" styleClass="status-pill" text="" />
+            </HBox>
 
-    <!-- Main content -->
-    <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+            <VBox spacing="10.0" styleClass="glass-card">
+                <padding>
+                    <Insets bottom="14.0" left="14.0" right="14.0" top="14.0"/>
+                </padding>
+                <Label styleClass="section-title" text="Haftalık Hedefler" />
+                <ProgressBar fx:id="weeklyGoalBar" prefWidth="260.0" progress="0.35" styleClass="weekly-progress" />
+                <Label fx:id="weeklyGoalLabel" text="Haftalık hedefe %65 kaldı" />
+            </VBox>
 
-        <!-- Workout list -->
-        <VBox prefWidth="310.0" spacing="8.0">
-            <Label style="-fx-font-weight: bold; -fx-font-size: 15px;" text="Son Antrenmanlar" />
-            <ListView fx:id="workoutListView" VBox.vgrow="ALWAYS" />
-        </VBox>
+            <HBox spacing="12.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="glass-card" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                    </padding>
+                    <Label styleClass="section-title" text="Su Tüketimi" />
+                    <Label fx:id="hydrationLabel" text="0/8 Bardak" HBox.hgrow="ALWAYS" />
+                    <Button text="-" onAction="#handleHydrationDecrease"/>
+                    <Button text="+" onAction="#handleHydrationIncrease"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="glass-card" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                    </padding>
+                    <Label styleClass="section-title" text="Kilo / BMI" />
+                    <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                        <Label fx:id="weightLabel" text="74.0 kg"/>
+                        <Label fx:id="bmiLabel" text="BMI: 24.2"/>
+                    </VBox>
+                    <Label fx:id="bmiBadgeLabel" styleClass="bmi-badge-desktop" text="Normal"/>
+                    <Button text="-" onAction="#handleWeightDecrease"/>
+                    <Button text="+" onAction="#handleWeightIncrease"/>
+                </HBox>
+            </HBox>
 
-        <!-- Chart + progress -->
-        <VBox HBox.hgrow="ALWAYS" spacing="10.0">
-            <LineChart fx:id="statisticsChart" prefHeight="300.0" title="Haftalık Antrenman (dk)">
-                <xAxis><CategoryAxis side="BOTTOM" /></xAxis>
-                <yAxis><NumberAxis side="LEFT" /></yAxis>
-            </LineChart>
-            <HBox alignment="CENTER" spacing="16.0">
-                <Label style="-fx-font-weight: bold; -fx-font-size: 13px;" text="Haftalık Şiddet Hedefi:" />
-                <StackPane fx:id="circularProgressContainer" />
+            <VBox spacing="10.0" styleClass="glass-card">
+                <padding>
+                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                </padding>
+                <Label styleClass="section-title" text="Günlük Performans Özeti" />
+                <HBox spacing="10.0">
+                    <VBox spacing="3.0" styleClass="metric-chip" HBox.hgrow="ALWAYS">
+                        <Label styleClass="metric-key" text="Aktif Dakika"/>
+                        <Label fx:id="activeMinutesLabel" styleClass="metric-value" text="0 dk"/>
+                    </VBox>
+                    <VBox spacing="3.0" styleClass="metric-chip" HBox.hgrow="ALWAYS">
+                        <Label styleClass="metric-key" text="Kalori"/>
+                        <Label fx:id="caloriesLabel" styleClass="metric-value" text="0 kcal"/>
+                    </VBox>
+                    <VBox spacing="3.0" styleClass="metric-chip" HBox.hgrow="ALWAYS">
+                        <Label styleClass="metric-key" text="Mesafe"/>
+                        <Label fx:id="distanceLabel" styleClass="metric-value" text="0.0 km"/>
+                    </VBox>
+                    <VBox spacing="3.0" styleClass="metric-chip" HBox.hgrow="ALWAYS">
+                        <Label styleClass="metric-key" text="Nabız"/>
+                        <Label fx:id="heartRateLabel" styleClass="metric-value" text="0 bpm"/>
+                    </VBox>
+                    <VBox spacing="3.0" styleClass="metric-chip" HBox.hgrow="ALWAYS">
+                        <Label styleClass="metric-key" text="Uyku"/>
+                        <Label fx:id="sleepLabel" styleClass="metric-value" text="0 sa"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Main content -->
+            <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+
+                <!-- Workout list -->
+                <VBox prefWidth="310.0" spacing="8.0" styleClass="glass-card">
+                    <padding>
+                        <Insets bottom="14.0" left="14.0" right="14.0" top="14.0"/>
+                    </padding>
+                    <Label styleClass="section-title" text="Son Antrenmanlar" />
+                    <ListView fx:id="workoutListView" VBox.vgrow="ALWAYS" />
+                </VBox>
+
+                <!-- Chart + progress -->
+                <VBox HBox.hgrow="ALWAYS" spacing="10.0" styleClass="glass-card">
+                    <padding>
+                        <Insets bottom="14.0" left="14.0" right="14.0" top="14.0"/>
+                    </padding>
+                    <LineChart fx:id="statisticsChart" prefHeight="300.0" title="Haftalık Antrenman (dk)">
+                        <xAxis><CategoryAxis side="BOTTOM" /></xAxis>
+                        <yAxis><NumberAxis side="LEFT" /></yAxis>
+                    </LineChart>
+                    <HBox alignment="CENTER" spacing="16.0">
+                        <Label styleClass="section-title" text="Haftalık Şiddet Hedefi:" />
+                        <StackPane fx:id="circularProgressContainer" />
+                    </HBox>
+                </VBox>
+
             </HBox>
         </VBox>
-
-    </HBox>
-</VBox>
+    </content>
+</ScrollPane>

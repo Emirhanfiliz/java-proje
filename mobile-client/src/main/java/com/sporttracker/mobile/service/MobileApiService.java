@@ -5,10 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.lang.reflect.Type;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 
 public class MobileApiService {
@@ -35,6 +37,7 @@ public class MobileApiService {
         HttpRequest.Builder b = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + path))
                 .header("Content-Type", "application/json")
+                .timeout(Duration.ofSeconds(15))
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
         if (token != null) b.header("Authorization", "Bearer " + token);
         return b.build();
@@ -43,22 +46,22 @@ public class MobileApiService {
     private static HttpRequest buildGet(String path, String token) {
         HttpRequest.Builder b = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + path))
+                .timeout(Duration.ofSeconds(15))
                 .GET();
         if (token != null) b.header("Authorization", "Bearer " + token);
         return b.build();
     }
 
     private static <T> T execute(HttpRequest request, Type type) throws Exception {
-        HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
-        
         try {
+            HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-            
+
             boolean success = false;
             if (json.has("success") && !json.get("success").isJsonNull()) {
                 success = json.get("success").getAsBoolean();
             } else if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                success = true; // Fallback if no success field but status is OK
+                success = true;
             }
 
             if (!success) {
@@ -74,8 +77,22 @@ public class MobileApiService {
             return json.has("data") && !json.get("data").isJsonNull()
                     ? GSON.fromJson(json.get("data"), type)
                     : null;
+        } catch (ConnectException | HttpTimeoutException e) {
+            throw new RuntimeException("Sunucuya ulaşılamadı. İnternetinizi veya servis durumunu kontrol edin.");
         } catch (com.google.gson.JsonSyntaxException e) {
-            throw new RuntimeException("Sunucudan geçersiz bir yanıt alındı. (HTTP " + response.statusCode() + ")");
+            throw new RuntimeException("Sunucudan geçersiz bir yanıt alındı.");
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("İstek işlenemedi. Lütfen tekrar deneyin.");
         }
+    }
+
+    public static String toUserMessage(Throwable ex, String fallbackMessage) {
+        String message = ex != null && ex.getMessage() != null ? ex.getMessage().trim() : "";
+        if (message.isEmpty()) {
+            return fallbackMessage;
+        }
+        return message;
     }
 }

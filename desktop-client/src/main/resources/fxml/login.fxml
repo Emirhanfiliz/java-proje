@@ -9,17 +9,17 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="420.0" prefWidth="400.0" spacing="14.0"
+<VBox alignment="CENTER" prefHeight="420.0" prefWidth="400.0" spacing="14.0" styleClass="auth-page"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.sporttracker.desktop.controller.LoginController">
     <padding>
         <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
     </padding>
 
-    <Label style="-fx-font-size: 26px; -fx-font-weight: bold;" text="Sport Tracker" />
-    <Label style="-fx-font-size: 13px; -fx-text-fill: #aaa;" text="Hesabınıza giriş yapın" />
+    <Label styleClass="app-title-desktop" text="Sport Tracker" />
+    <Label styleClass="app-subtitle-desktop" text="Hesabınıza giriş yapın" />
 
-    <Label fx:id="errorLabel" text="" wrapText="true" />
+    <Label fx:id="errorLabel" styleClass="error-pill" text="" wrapText="true" />
 
     <VBox spacing="5.0">
         <Label text="Email" />

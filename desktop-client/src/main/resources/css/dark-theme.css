@@ -1,12 +1,135 @@
 /* ── Root ───────────────────────────────────────────────── */
 .root {
-    -fx-background-color: #1a1a2e;
+    -fx-background-color: radial-gradient(center 10% 0%, radius 140%, rgba(255,65,108,0.20), transparent),
+                          radial-gradient(center 100% 100%, radius 140%, rgba(108,99,255,0.22), transparent),
+                          linear-gradient(to bottom, #0b1020, #121735 45%, #1a1f3b);
     -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.auth-page {
+    -fx-background-color: rgba(19, 25, 53, 0.72);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
 }
 
 /* ── Labels ─────────────────────────────────────────────── */
 .label {
     -fx-text-fill: #e0e0e0;
+}
+
+.app-title-desktop {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.app-subtitle-desktop {
+    -fx-font-size: 13px;
+    -fx-text-fill: #a7afcf;
+}
+
+.section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #dfe4ff;
+}
+
+.dashboard-welcome {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.status-pill {
+    -fx-font-size: 12px;
+    -fx-text-fill: #ced5ff;
+    -fx-background-color: rgba(108, 99, 255, 0.20);
+    -fx-background-radius: 999;
+    -fx-padding: 6 12 6 12;
+}
+
+.streak-badge {
+    -fx-background-color: linear-gradient(to right, #ff7f50, #ff416c);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 999;
+}
+
+.weekly-progress {
+    -fx-accent: #ff4b86;
+}
+
+.weekly-progress .bar {
+    -fx-background-color: linear-gradient(to right, #6c63ff, #ff4b86);
+    -fx-background-radius: 8;
+}
+
+.weekly-progress .track {
+    -fx-background-color: rgba(37,37,64,0.9);
+    -fx-background-radius: 8;
+}
+
+.bmi-badge-desktop {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 999;
+}
+
+.bmi-under-desktop {
+    -fx-background-color: #5ca9ff;
+}
+
+.bmi-normal-desktop {
+    -fx-background-color: #2ecc71;
+}
+
+.bmi-over-desktop {
+    -fx-background-color: #ff7f50;
+}
+
+.error-pill {
+    -fx-text-fill: #ff91a8;
+    -fx-background-color: rgba(255, 107, 138, 0.14);
+    -fx-background-radius: 10;
+    -fx-padding: 6 10 6 10;
+}
+
+.glass-card {
+    -fx-background-color: rgba(19, 25, 53, 0.72);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+}
+
+.metric-chip {
+    -fx-background-color: rgba(37, 37, 64, 0.92);
+    -fx-background-radius: 10;
+    -fx-padding: 8 10 8 10;
+}
+
+.metric-key {
+    -fx-text-fill: #a9b1d0;
+    -fx-font-size: 11px;
+}
+
+.metric-value {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.profile-avatar-desktop {
+    -fx-font-size: 24px;
+    -fx-background-color: rgba(37,37,64,0.95);
+    -fx-background-radius: 999;
+    -fx-padding: 6 10 6 10;
 }
 
 /* ── Text inputs ─────────────────────────────────────────── */
@@ -76,8 +199,8 @@
 
 /* ── ListView ────────────────────────────────────────────── */
 .list-view {
-    -fx-background-color: #16213e;
-    -fx-border-color: #0f3460;
+    -fx-background-color: rgba(22,33,62,0.72);
+    -fx-border-color: #2b3f73;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
 }
@@ -105,7 +228,7 @@
 
 /* ── Charts ──────────────────────────────────────────────── */
 .chart {
-    -fx-background-color: #16213e;
+    -fx-background-color: rgba(22,33,62,0.72);
     -fx-padding: 10;
 }
 
@@ -119,12 +242,12 @@
 }
 
 .chart-series-line {
-    -fx-stroke: #007bff;
+    -fx-stroke: #ff4b86;
     -fx-stroke-width: 2.5px;
 }
 
 .chart-line-symbol {
-    -fx-background-color: #007bff, white;
+    -fx-background-color: #ff4b86, white;
 }
 
 .chart-title {
@@ -157,4 +280,13 @@
 .scroll-bar .thumb {
     -fx-background-color: #0f3460;
     -fx-background-radius: 4;
+}
+
+.dashboard-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.dashboard-scroll .viewport {
+    -fx-background-color: transparent;
 }

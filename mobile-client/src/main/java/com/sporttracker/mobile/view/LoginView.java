@@ -12,12 +12,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
 
@@ -43,7 +43,7 @@ public class LoginView extends View {
         appBar.setVisible(false);
     }
 
-    private VBox buildLayout() {
+    private ScrollPane buildLayout() {
         VBox root = new VBox(0);
         root.setAlignment(Pos.TOP_CENTER);
         root.getStyleClass().add("login-root");
@@ -54,7 +54,11 @@ public class LoginView extends View {
         VBox.setMargin(form, new Insets(-30, 0, 0, 0));
 
         root.getChildren().addAll(header, form);
-        return root;
+
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("auth-scroll");
+        return scrollPane;
     }
 
     private StackPane buildHeader() {
@@ -95,13 +99,15 @@ public class LoginView extends View {
 
     private VBox buildForm() {
         VBox card = new VBox(16);
-        card.getStyleClass().add("login-card");
+        card.getStyleClass().addAll("login-card", "auth-card");
         card.setPadding(new Insets(36, 28, 32, 28));
         card.setMaxWidth(380);
         card.setAlignment(Pos.CENTER);
 
         Label formTitle = new Label("Hesabına Giriş Yap");
         formTitle.getStyleClass().add("form-title");
+        Label formSubtitle = new Label("Antrenmanlarını takip etmek için giriş yap");
+        formSubtitle.getStyleClass().add("auth-subtitle");
 
         VBox emailBox = buildFieldGroup("E-Posta", emailField, "email-field");
         emailField.setPromptText("ornek@email.com");
@@ -139,6 +145,7 @@ public class LoginView extends View {
 
         card.getChildren().addAll(
                 formTitle,
+                formSubtitle,
                 emailBox,
                 passwordBox,
                 errorLabel,
@@ -207,7 +214,8 @@ public class LoginView extends View {
                         getApplication().switchView(com.sporttracker.mobile.MobileApp.WORKOUT_VIEW));
             } catch (Exception ex) {
                 Platform.runLater(() -> {
-                    errorLabel.setText("Giriş başarısız: " + ex.getMessage());
+                    errorLabel.getStyleClass().remove("success-label");
+                    errorLabel.setText(MobileApiService.toUserMessage(ex, "Giriş yapılamadı. Lütfen tekrar deneyin."));
                     setLoading(false);
                 });
             }

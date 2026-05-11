@@ -59,7 +59,7 @@ public class LoginController extends BaseController {
 
         task.setOnFailed(e -> Platform.runLater(() -> {
             setLoading(false);
-            showError(errorLabel, "Sunucuya bağlanılamadı");
+            showError(errorLabel, "Sunucuya ulaşılamadı. Lütfen bağlantınızı kontrol edin.");
         }));
 
         new Thread(task, "login-thread").start();

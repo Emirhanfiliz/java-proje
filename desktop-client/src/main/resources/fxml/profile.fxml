@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="560.0" prefWidth="480.0" spacing="12.0"
+      styleClass="auth-page"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.sporttracker.desktop.controller.ProfileController">
+    <padding>
+        <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
+    </padding>
+
+    <Label styleClass="app-title-desktop" text="Profilim"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Profil Foto"/>
+        <Label fx:id="avatarPreview" styleClass="profile-avatar-desktop" text="🏃"/>
+        <TextField fx:id="avatarField" promptText="Emoji"/>
+    </HBox>
+
+    <VBox spacing="4.0">
+        <Label text="Görünen Ad"/>
+        <TextField fx:id="displayNameField" promptText="Ad Soyad"/>
+    </VBox>
+
+    <VBox spacing="4.0">
+        <Label text="Boy (cm)"/>
+        <TextField fx:id="heightField" promptText="175"/>
+    </VBox>
+
+    <VBox spacing="4.0">
+        <Label text="Kilo (kg)"/>
+        <TextField fx:id="weightField" promptText="74"/>
+    </VBox>
+
+    <VBox spacing="4.0">
+        <Label text="Günlük Hedef (adım)"/>
+        <TextField fx:id="dailyGoalField" promptText="10000"/>
+    </VBox>
+
+    <Label fx:id="statusLabel" styleClass="status-pill"/>
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button styleClass="button-success" text="Kaydet" onAction="#handleSave"/>
+        <Button styleClass="button-link" text="Geri Dön" onAction="#handleBack"/>
+    </HBox>
+</VBox>

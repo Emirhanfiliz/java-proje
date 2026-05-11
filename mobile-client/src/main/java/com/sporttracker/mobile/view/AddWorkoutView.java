@@ -28,35 +28,42 @@ public class AddWorkoutView extends View {
 
     public AddWorkoutView() {
         getStylesheets().add(AddWorkoutView.class.getResource("/mobile.css").toExternalForm());
+        getStyleClass().add("workout-detail-view");
 
         nameField.setPromptText("Antrenman adı (Örn: Kardiyo)");
+        nameField.getStyleClass().add("text-field");
         durationField.setPromptText("Süre (dakika)");
+        durationField.getStyleClass().add("text-field");
         errorLabel.getStyleClass().add("error-label");
         saveButton.getStyleClass().add("primary-button");
-        saveButton.setPrefWidth(220);
+        saveButton.setMaxWidth(Double.MAX_VALUE);
+        saveButton.setPrefHeight(48);
         spinner.setPrefSize(28, 28);
         spinner.setVisible(false);
 
         saveButton.setOnAction(e -> handleSave());
 
-        VBox form = new VBox(12,
-                new Label("Antrenman Bilgileri"),
-                errorLabel,
-                nameField,
-                durationField,
-                saveButton,
-                spinner);
+        Label formTitle = new Label("Antrenman Bilgileri");
+        formTitle.getStyleClass().add("form-title");
+        Label subtitle = new Label("Yeni seansını hızlıca oluştur");
+        subtitle.getStyleClass().add("auth-subtitle");
+
+        VBox form = new VBox(12, formTitle, subtitle, errorLabel, nameField, durationField, saveButton, spinner);
+        form.getStyleClass().addAll("detail-card", "auth-card");
         form.setAlignment(Pos.CENTER);
         form.setPadding(new Insets(30, 24, 30, 24));
-        form.setMaxWidth(340);
+        form.setMaxWidth(380);
 
-        setCenter(form);
+        VBox wrapper = new VBox(form);
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.setPadding(new Insets(20));
+        setCenter(wrapper);
     }
 
     @Override
     protected void updateAppBar(AppBar appBar) {
         appBar.setTitleText("Yeni Antrenman");
-        Button backBtn = new Button("Geri");
+        Button backBtn = new Button("← Geri");
         backBtn.getStyleClass().add("link-button");
         backBtn.setOnAction(e -> getApplication().switchView(com.sporttracker.mobile.MobileApp.WORKOUT_VIEW));
         appBar.setNavIcon(backBtn);
@@ -83,6 +90,7 @@ public class AddWorkoutView extends View {
                 "name",        name,
                 "description", duration + " dakika",
                 "date",        LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                "durationInMinutes", Integer.parseInt(duration),
                 "exercises",   List.of()
         );
 
@@ -94,7 +102,7 @@ public class AddWorkoutView extends View {
                 Platform.runLater(() -> {
                     saveButton.setDisable(false);
                     spinner.setVisible(false);
-                    errorLabel.setText("Kaydedilemedi: " + ex.getMessage());
+                    errorLabel.setText(MobileApiService.toUserMessage(ex, "Antrenman kaydedilemedi. Lütfen tekrar deneyin."));
                 });
             }
         }, "mobile-save-workout").start();
