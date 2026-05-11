@@ -14,6 +14,7 @@ RUN mvn dependency:go-offline -pl statistics-service -am -B -q
 
 COPY shared-library/src shared-library/src
 COPY statistics-service/src statistics-service/src
+COPY database/postgres/schema.sql database/postgres/schema.sql
 
 RUN mvn clean package -pl statistics-service -am -DskipTests -B -q
 
