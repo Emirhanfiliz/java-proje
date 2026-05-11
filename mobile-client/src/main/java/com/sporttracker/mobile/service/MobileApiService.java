@@ -13,7 +13,7 @@ import java.time.Duration;
 
 public class MobileApiService {
 
-    private static final String     BASE_URL = "http://localhost:8080";
+    private static final String     BASE_URL = "http://localhost:8084";
     private static final HttpClient HTTP     = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
@@ -50,12 +50,32 @@ public class MobileApiService {
 
     private static <T> T execute(HttpRequest request, Type type) throws Exception {
         HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-        if (!json.get("success").getAsBoolean()) {
-            throw new RuntimeException(json.has("message") ? json.get("message").getAsString() : "API error");
+        
+        try {
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+            
+            boolean success = false;
+            if (json.has("success") && !json.get("success").isJsonNull()) {
+                success = json.get("success").getAsBoolean();
+            } else if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                success = true; // Fallback if no success field but status is OK
+            }
+
+            if (!success) {
+                String errorMsg = "Bilinmeyen hata";
+                if (json.has("message") && !json.get("message").isJsonNull()) {
+                    errorMsg = json.get("message").getAsString();
+                } else if (json.has("error") && !json.get("error").isJsonNull()) {
+                    errorMsg = json.get("error").getAsString();
+                }
+                throw new RuntimeException(errorMsg);
+            }
+            
+            return json.has("data") && !json.get("data").isJsonNull()
+                    ? GSON.fromJson(json.get("data"), type)
+                    : null;
+        } catch (com.google.gson.JsonSyntaxException e) {
+            throw new RuntimeException("Sunucudan geçersiz bir yanıt alındı. (HTTP " + response.statusCode() + ")");
         }
-        return json.has("data") && !json.get("data").isJsonNull()
-                ? GSON.fromJson(json.get("data"), type)
-                : null;
     }
 }

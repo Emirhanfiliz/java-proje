@@ -53,9 +53,22 @@ public class ApiClient {
         try {
             HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json    = JsonParser.parseString(response.body()).getAsJsonObject();
-            boolean    success = json.get("success").getAsBoolean();
-            String     message = json.has("message") ? json.get("message").getAsString() : "";
-            T          data    = null;
+            
+            boolean success = false;
+            if (json.has("success") && !json.get("success").isJsonNull()) {
+                success = json.get("success").getAsBoolean();
+            } else if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                success = true;
+            }
+
+            String message = "";
+            if (json.has("message") && !json.get("message").isJsonNull()) {
+                message = json.get("message").getAsString();
+            } else if (json.has("error") && !json.get("error").isJsonNull()) {
+                message = json.get("error").getAsString();
+            }
+
+            T data = null;
             if (json.has("data") && !json.get("data").isJsonNull()) {
                 data = GSON.fromJson(json.get("data"), dataType);
             }
