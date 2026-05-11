@@ -650,3 +650,138 @@
     -fx-background-radius: 999;
     -fx-padding: 8 10 8 10;
 }
+
+/* ── Wellness Hub Mobile ─────────────────────── */
+
+.wellness-tabs {
+    -fx-background-color: transparent;
+}
+
+.wellness-tabs .tab-header-area {
+    -fx-background-color: transparent;
+}
+
+.wellness-tabs .tab-header-background {
+    -fx-background-color: rgba(26, 26, 46, 0.45);
+    -fx-background-radius: 12 12 0 0;
+}
+
+.wellness-tabs .tab {
+    -fx-background-color: rgba(37, 37, 64, 0.0);
+    -fx-padding: 6 10 6 10;
+}
+
+.wellness-tabs .tab .tab-label {
+    -fx-text-fill: #c0c8ee;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.wellness-tabs .tab:selected {
+    -fx-background-color: linear-gradient(to right, #FF416C, #FF4B2B);
+    -fx-background-radius: 10 10 0 0;
+}
+
+.wellness-tabs .tab:selected .tab-label {
+    -fx-text-fill: #ffffff;
+}
+
+.wellness-tabs .tab-content-area {
+    -fx-background-color: transparent;
+}
+
+.split-tag {
+    -fx-background-color: linear-gradient(to right, #FF416C, #FF4B2B);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+}
+
+.rest-tag {
+    -fx-background-color: rgba(108, 99, 255, 0.30);
+    -fx-text-fill: #c7cdf8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+}
+
+.badge-chip {
+    -fx-background-color: linear-gradient(to right, #FF416C, #FF4B2B);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-padding: 6 12 6 12;
+}
+
+.spinner .text-field {
+    -fx-background-color: #0f0f1a;
+    -fx-text-fill: #e0e0f0;
+    -fx-border-color: #2a2a4a;
+    -fx-pref-height: 36;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: #2a2a4a;
+}
+
+.combo-box {
+    -fx-background-color: #0f0f1a;
+    -fx-text-fill: #e0e0f0;
+    -fx-border-color: #2a2a4a;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #e0e0f0;
+    -fx-background-color: #0f0f1a;
+}
+
+.choice-box {
+    -fx-background-color: #0f0f1a;
+    -fx-text-fill: #e0e0f0;
+    -fx-border-color: #2a2a4a;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.choice-box .label {
+    -fx-text-fill: #e0e0f0;
+}
+
+.check-box .text {
+    -fx-fill: #dfe4ff;
+}
+
+/* ====== Mobile Dashboard Wellness Sections ====== */
+.dashboard-section-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: linear-gradient(to right, #ff9966, #ff6b8a);
+    -fx-padding: 6 0 2 0;
+}
+
+.habit-chip {
+    -fx-background-color: rgba(102, 114, 184, 0.30);
+    -fx-text-fill: #e0e0f0;
+    -fx-background-radius: 18;
+    -fx-padding: 6 12;
+    -fx-font-size: 12px;
+}
+.habit-chip:hover { -fx-background-color: rgba(102, 114, 184, 0.55); }
+
+.habit-chip-done {
+    -fx-background-color: linear-gradient(to right, #43cea2, #185a9d);
+    -fx-text-fill: white;
+    -fx-background-radius: 18;
+    -fx-padding: 6 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}

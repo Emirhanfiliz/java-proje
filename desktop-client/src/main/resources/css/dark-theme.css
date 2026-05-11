@@ -290,3 +290,193 @@
 .dashboard-scroll .viewport {
     -fx-background-color: transparent;
 }
+
+/* ── Wellness Hub ────────────────────────────────────────── */
+.dashboard-motivation {
+    -fx-text-fill: #c7cdf8;
+    -fx-font-style: italic;
+    -fx-font-size: 13px;
+}
+
+.wellness-tabs {
+    -fx-background-color: transparent;
+}
+
+.wellness-tabs .tab-header-area {
+    -fx-background-color: transparent;
+}
+
+.wellness-tabs .tab-header-background {
+    -fx-background-color: rgba(19, 25, 53, 0.55);
+    -fx-background-radius: 12 12 0 0;
+}
+
+.wellness-tabs .tab {
+    -fx-background-color: rgba(37, 37, 64, 0.0);
+    -fx-background-insets: 0;
+    -fx-padding: 6 14 6 14;
+}
+
+.wellness-tabs .tab .tab-label {
+    -fx-text-fill: #b6bce6;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.wellness-tabs .tab:selected {
+    -fx-background-color: linear-gradient(to right, #6c63ff, #ff4b86);
+    -fx-background-radius: 10 10 0 0;
+}
+
+.wellness-tabs .tab:selected .tab-label {
+    -fx-text-fill: #ffffff;
+}
+
+.wellness-tabs .tab-content-area {
+    -fx-background-color: transparent;
+}
+
+.wellness-day-card {
+    -fx-background-color: rgba(37, 37, 64, 0.85);
+    -fx-background-radius: 14;
+    -fx-padding: 12;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-radius: 14;
+}
+
+.split-tag {
+    -fx-background-color: linear-gradient(to right, #6c63ff, #ff4b86);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+}
+
+.rest-tag {
+    -fx-background-color: rgba(108, 99, 255, 0.30);
+    -fx-text-fill: #c7cdf8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+}
+
+.challenge-card {
+    -fx-background-color: rgba(37, 37, 64, 0.85);
+    -fx-background-radius: 14;
+    -fx-padding: 12;
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-radius: 14;
+}
+
+.badge-chip {
+    -fx-background-color: linear-gradient(to right, #6c63ff, #ff4b86);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-padding: 6 12 6 12;
+}
+
+.table-view {
+    -fx-background-color: rgba(22,33,62,0.72);
+    -fx-table-cell-border-color: rgba(255,255,255,0.04);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgba(15, 52, 96, 0.75);
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #dfe4ff;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgba(30, 42, 69, 0.55);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(108, 99, 255, 0.35);
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button {
+    -fx-background-color: transparent;
+}
+
+.spinner .text-field {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-text-fill: #ffffff;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: #0f3460;
+}
+
+.choice-box {
+    -fx-background-color: #16213e;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.choice-box .label {
+    -fx-text-fill: #ffffff;
+}
+
+.combo-box {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #e0e0e0;
+}
+
+.check-box .text {
+    -fx-fill: #dfe4ff;
+}
+
+/* ====== Dashboard Wellness Sections ====== */
+.dashboard-section-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: linear-gradient(to right, #6c8cff, #b56cff);
+    -fx-padding: 8 0 2 0;
+}
+
+.habit-chip {
+    -fx-background-color: rgba(64, 88, 156, 0.35);
+    -fx-text-fill: #dfe4ff;
+    -fx-background-radius: 18;
+    -fx-padding: 6 12;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+.habit-chip:hover { -fx-background-color: rgba(108, 140, 255, 0.55); }
+
+.habit-chip-done {
+    -fx-background-color: linear-gradient(to right, #2ecc71, #27ae60);
+    -fx-text-fill: white;
+    -fx-background-radius: 18;
+    -fx-padding: 6 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}

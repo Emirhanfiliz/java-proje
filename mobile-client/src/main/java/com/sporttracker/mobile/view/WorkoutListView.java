@@ -9,7 +9,13 @@ import com.sporttracker.mobile.service.MobileApiService;
 import com.sporttracker.mobile.service.StepCounterService;
 import com.sporttracker.mobile.session.MobileProfileStore;
 import com.sporttracker.mobile.session.MobileSessionManager;
+import com.sporttracker.mobile.wellness.SmartReminderService;
+import com.sporttracker.mobile.wellness.WellnessStore;
+import com.sporttracker.shared.wellness.Reminder;
+import com.sporttracker.shared.wellness.WellnessData;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -83,6 +89,10 @@ public class WorkoutListView extends View {
     private List<Map<String, Object>> lastSuccessfulWorkouts = new ArrayList<>();
     private boolean fabExpanded = false;
 
+    private final VBox wellnessGroupA = new VBox(10);
+    private final VBox wellnessGroupB = new VBox(10);
+    private final HBox badgeStrip = new HBox(6);
+
     private static final String[] MOTIVATIONS = {
         "Sınırlarını zorla, potansiyelini keşfet! 🚀",
         "Bugün attığın her adım seni hedefine yaklaştırır. 🏃",
@@ -119,12 +129,25 @@ public class WorkoutListView extends View {
         HBox weeklyGoalsCard = buildWeeklyGoalsCard();
         VBox performanceCard = buildPerformancePulseCard();
 
+        Label wellnessHeader = new Label("🩺  Sağlık & Performans");
+        wellnessHeader.getStyleClass().add("dashboard-section-label");
+
+        Label workoutHeader = new Label("📊  Antrenman Verileri");
+        workoutHeader.getStyleClass().add("dashboard-section-label");
+
+        badgeStrip.setAlignment(Pos.CENTER_LEFT);
+
         VBox content = new VBox(
                 16,
                 topHeader,
+                badgeStrip,
                 stepCard,
                 weeklyGoalsCard,
                 performanceCard,
+                wellnessHeader,
+                wellnessGroupA,
+                wellnessGroupB,
+                workoutHeader,
                 calorieChart,
                 categoryChart,
                 spinner,
@@ -178,8 +201,43 @@ public class WorkoutListView extends View {
                 updateHydrationUI();
                 updateWeightBmiUI();
                 updatePerformancePulse();
+                refreshWellnessSections();
                 loadWorkoutsAndStats();
+                SmartReminderService.getInstance().start(this::showReminder);
             }
+        });
+    }
+
+    private void refreshWellnessSections() {
+        try {
+            WellnessData data = WellnessStore.load();
+            wellnessGroupA.getChildren().setAll(
+                    WellnessSections.buildPlanCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildAdaptiveGoalsCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildRecoveryCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildHrZoneCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildPrCard(data, this::refreshWellnessSections)
+            );
+            wellnessGroupB.getChildren().setAll(
+                    WellnessSections.buildHabitCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildReminderCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildMealCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildTrendCard(data, this::refreshWellnessSections),
+                    WellnessSections.buildChallengeCard(data, this::refreshWellnessSections)
+            );
+            badgeStrip.getChildren().setAll(WellnessSections.buildBadgeStrip(data).getChildren());
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private void showReminder(Reminder reminder) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("⏰ " + (reminder.getLabel() == null ? "Hatırlatıcı" : reminder.getLabel()));
+            alert.setHeaderText(null);
+            alert.setContentText(reminder.getMessage() == null ? "" : reminder.getMessage());
+            alert.show();
         });
     }
 

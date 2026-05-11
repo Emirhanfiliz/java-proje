@@ -6,7 +6,17 @@ import com.sporttracker.desktop.api.ApiResult;
 import com.sporttracker.desktop.api.dto.WorkoutDto;
 import com.sporttracker.desktop.session.DesktopProfileStore;
 import com.sporttracker.desktop.session.SessionManager;
+import com.sporttracker.desktop.wellness.SmartReminderService;
+import com.sporttracker.desktop.wellness.WellnessStore;
+import com.sporttracker.shared.wellness.Reminder;
+import com.sporttracker.shared.wellness.WellnessData;
 import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -51,6 +61,12 @@ public class DashboardController extends BaseController {
     @FXML private Label                        heartRateLabel;
     @FXML private Label                        sleepLabel;
 
+    @FXML private HBox wellnessRow1;
+    @FXML private HBox wellnessRow2;
+    @FXML private HBox wellnessRow3;
+    @FXML private HBox wellnessRow4;
+    @FXML private HBox badgeStrip;
+
     private final ObservableList<String> workoutItems = FXCollections.observableArrayList();
     private final List<String> lastSuccessfulWorkoutItems = new ArrayList<>();
     private int hydrationCurrent = 0;
@@ -82,6 +98,74 @@ public class DashboardController extends BaseController {
         updatePerformancePulse();
         updateWeeklyGoalsUI(0.35);
         loadWorkoutsAsync();
+        applyAdaptiveGoalsHint();
+        refreshWellnessSections();
+        SmartReminderService.getInstance().start(this::showReminder);
+    }
+
+    private void applyAdaptiveGoalsHint() {
+        try {
+            WellnessData data = WellnessStore.load();
+            if (data.getAdaptiveGoals() == null) return;
+            int goal = data.getAdaptiveGoals().getWeeklyWorkoutGoal();
+            if (goal > 0 && weeklyGoalLabel != null) {
+                weeklyGoalLabel.setText("Haftalık hedef: " + goal + " antrenman (otomatik ayarlanır)");
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private void refreshWellnessSections() {
+        try {
+            WellnessData data = WellnessStore.load();
+            if (wellnessRow1 != null) {
+                wellnessRow1.getChildren().setAll(
+                        wrap(WellnessSections.buildPlanCard(data, this::refreshWellnessSections)),
+                        wrap(WellnessSections.buildAdaptiveGoalsCard(data, this::refreshWellnessSections)),
+                        wrap(WellnessSections.buildTrendCard(data, this::refreshWellnessSections))
+                );
+            }
+            if (wellnessRow2 != null) {
+                wellnessRow2.getChildren().setAll(
+                        wrap(WellnessSections.buildRecoveryCard(data, this::refreshWellnessSections)),
+                        wrap(WellnessSections.buildHrZoneCard(data, this::refreshWellnessSections)),
+                        wrap(WellnessSections.buildPrCard(data, this::refreshWellnessSections))
+                );
+            }
+            if (wellnessRow3 != null) {
+                wellnessRow3.getChildren().setAll(
+                        wrap(WellnessSections.buildHabitCard(data, this::refreshWellnessSections)),
+                        wrap(WellnessSections.buildReminderCard(data, this::refreshWellnessSections)),
+                        wrap(WellnessSections.buildMealCard(data, this::refreshWellnessSections))
+                );
+            }
+            if (wellnessRow4 != null) {
+                wellnessRow4.getChildren().setAll(
+                        wrap(WellnessSections.buildChallengeCard(data, this::refreshWellnessSections))
+                );
+            }
+            if (badgeStrip != null) {
+                badgeStrip.getChildren().setAll(WellnessSections.buildBadgeStrip(data).getChildren());
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private Node wrap(VBox card) {
+        HBox.setHgrow(card, Priority.ALWAYS);
+        card.setMaxWidth(Double.MAX_VALUE);
+        return card;
+    }
+
+    private void showReminder(Reminder reminder) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("⏰ Hatırlatıcı");
+            alert.setHeaderText(reminder.getLabel());
+            alert.setContentText(reminder.getMessage());
+            alert.show();
+        });
     }
 
     @FXML
