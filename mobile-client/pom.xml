@@ -41,6 +41,31 @@
             <artifactId>charm-glisten</artifactId>
             <version>6.2.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>display</artifactId>
+            <version>4.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>util</artifactId>
+            <version>4.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>lifecycle</artifactId>
+            <version>4.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>storage</artifactId>
+            <version>4.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>statusbar</artifactId>
+            <version>4.0.19</version>
+        </dependency>
 
         <!-- Gson for API calls -->
         <dependency>
