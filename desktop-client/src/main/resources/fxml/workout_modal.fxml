@@ -1,30 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-import javafx.geometry.Insets?>
-import javafx.scene.control.Button?>
-import javafx.scene.control.Label?>
-import javafx.scene.control.TextField?>
-import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="300.0" prefWidth="300.0" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sporttracker.desktop.controller.WorkoutModalController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.sporttracker.desktop.controller.WorkoutModalController"
+           style="-fx-background-color: #1a1a2e;">
 
-    <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Antrenman Bilgileri" />
-    
-    <Label fx:id="errorLabel" textFill="RED" />
+    <VBox fx:id="modalCard" alignment="TOP_LEFT" prefWidth="460.0" spacing="14.0"
+          style="-fx-background-color: #16213e; -fx-background-radius: 12;
+                 -fx-border-color: #0f3460; -fx-border-radius: 12; -fx-border-width: 1.5;
+                 -fx-effect: dropshadow(gaussian, #000000aa, 24, 0, 0, 8);">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="24.0"/>
+        </padding>
 
-    <VBox spacing="5.0">
-        <Label text="Antrenman Adı" />
-        <TextField fx:id="nameField" promptText="Örn: Kardiyo" />
+        <HBox alignment="CENTER_LEFT">
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #e0e0e0;"
+                   text="🏋️  Yeni Antrenman"/>
+        </HBox>
+        <Label style="-fx-font-size: 11.5px; -fx-text-fill: #888;"
+               text="Antrenman bilgilerini doldurun ve kaydedin"/>
+
+        <Label fx:id="errorLabel" style="-fx-text-fill: #ff6b6b; -fx-font-size: 12px;"
+               text="" wrapText="true"/>
+
+        <VBox spacing="5.0">
+            <Label style="-fx-text-fill: #aaa; -fx-font-size: 12px;" text="ANTRENMAN ADI"/>
+            <TextField fx:id="nameField" promptText="Örn: Sabah Kardiyo"
+                       style="-fx-font-size: 14px;"/>
+        </VBox>
+
+        <HBox spacing="12.0" alignment="CENTER_LEFT">
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label style="-fx-text-fill: #aaa; -fx-font-size: 12px;" text="SÜRE (DAKİKA)"/>
+                <TextField fx:id="durationField" promptText="Örn: 45"
+                           style="-fx-font-size: 14px;"/>
+            </VBox>
+            <VBox spacing="5.0">
+                <Label style="-fx-text-fill: #aaa; -fx-font-size: 12px;" text="ŞİDDET"/>
+                <ComboBox fx:id="intensityCombo" prefWidth="115.0"
+                          style="-fx-background-color: #0d1b35; -fx-border-color: #1a3060;
+                                 -fx-border-radius: 8; -fx-background-radius: 8;
+                                 -fx-text-fill: #e0e0e0;"/>
+            </VBox>
+        </HBox>
+
+        <Label fx:id="calorieLabel" styleClass="calorie-label" text=""/>
+
+        <VBox spacing="5.0">
+            <Label style="-fx-text-fill: #aaa; -fx-font-size: 12px;" text="NOTLAR (İSTEĞE BAĞLI)"/>
+            <TextArea fx:id="notesField" promptText="Antrenman hakkında notlar..."
+                      prefHeight="60.0" wrapText="true"
+                      style="-fx-background-color: #0d1b35; -fx-border-color: #1a3060;
+                             -fx-border-radius: 8; -fx-background-radius: 8;
+                             -fx-text-fill: #e0e0e0; -fx-prompt-text-fill: #555;
+                             -fx-padding: 8 12 8 12;"/>
+        </VBox>
+
+        <VBox spacing="8.0">
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #ccc;"
+                       text="EGZERSİZLER" HBox.hgrow="ALWAYS"/>
+                <Button onAction="#handleAddExercise" styleClass="btn-add-exercise"
+                        text="+ Egzersiz Ekle"/>
+            </HBox>
+            <Label style="-fx-text-fill: #555; -fx-font-size: 11px;"
+                   text="Ad  |  Set  |  Tek.  |  kg"/>
+            <VBox fx:id="exercisesContainer" spacing="6.0"/>
+        </VBox>
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <Button fx:id="cancelButton" onAction="#handleCancel" prefWidth="110.0" text="İptal"
+                    style="-fx-background-color: #2a2a4a; -fx-text-fill: #aaa;
+                           -fx-background-radius: 8; -fx-border-radius: 8;
+                           -fx-padding: 9 16 9 16; -fx-cursor: hand;"/>
+            <Button fx:id="saveButton" onAction="#handleSave" prefWidth="160.0" text="💾  Kaydet"
+                    style="-fx-background-color: linear-gradient(to right, #007bff, #0056b3);
+                           -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-border-radius: 8;
+                           -fx-padding: 9 16 9 16; -fx-cursor: hand;
+                           -fx-effect: dropshadow(gaussian, #007bff66, 8, 0, 0, 2);"/>
+        </HBox>
+
     </VBox>
-
-    <VBox spacing="5.0">
-        <Label text="Süre (Dakika)" />
-        <TextField fx:id="durationField" promptText="Örn: 45" />
-    </VBox>
-
-    <Button onAction="#handleSave" prefWidth="200.0" style="-fx-background-color: #007bff; -fx-text-fill: white;" text="Kaydet" />
-    <Button onAction="#handleCancel" prefWidth="200.0" text="İptal" />
-</VBox>
+</StackPane>

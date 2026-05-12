@@ -480,3 +480,56 @@
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
+
+.calorie-label {
+    -fx-text-fill: #ffd700;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-color: rgba(255,215,0,0.08);
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(255,215,0,0.2);
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+.exercise-row {
+    -fx-background-color: rgba(255,255,255,0.03);
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-padding: 4 8 4 8;
+}
+
+.btn-delete {
+    -fx-background-color: #3a1a1a;
+    -fx-text-fill: #ff6b6b;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 4 8 4 8;
+    -fx-cursor: hand;
+    -fx-font-size: 11px;
+}
+
+.btn-delete:hover {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+}
+
+.btn-add-exercise {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4da3ff;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-background-radius: 6;
+    -fx-padding: 5 12 5 12;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.btn-add-exercise:hover {
+    -fx-border-color: #4da3ff;
+    -fx-background-color: rgba(77,163,255,0.08);
+}

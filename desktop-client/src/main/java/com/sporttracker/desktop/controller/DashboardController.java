@@ -35,6 +35,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.lang.reflect.Type;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -68,7 +70,8 @@ public class DashboardController extends BaseController {
     @FXML private HBox badgeStrip;
 
     private final ObservableList<String> workoutItems = FXCollections.observableArrayList();
-    private final List<String> lastSuccessfulWorkoutItems = new ArrayList<>();
+    private final List<String>     lastSuccessfulWorkoutItems = new ArrayList<>();
+    private final List<WorkoutDto> loadedWorkouts             = new ArrayList<>();
     private int hydrationCurrent = 0;
     private final int hydrationTarget = 8;
     private double currentWeight = 74.0;
@@ -91,6 +94,7 @@ public class DashboardController extends BaseController {
         streakLabel.setText("🔥 " + (3 + new Random().nextInt(9)) + " Gün");
 
         workoutListView.setItems(workoutItems);
+        workoutListView.setOnMouseClicked(e -> { if (e.getClickCount() == 1) openWorkoutDetail(); });
         buildChart();
         addProgressBar();
         updateHydrationUI();
@@ -232,11 +236,15 @@ public class DashboardController extends BaseController {
             ApiResult<List<WorkoutDto>> result = task.getValue();
             workoutItems.clear();
             if (result.isSuccess() && result.getData() != null) {
-                result.getData().forEach(w -> workoutItems.add(w.toDisplayString()));
+                List<WorkoutDto> workouts = result.getData();
+                workouts.forEach(w -> workoutItems.add(w.toDisplayString()));
                 lastSuccessfulWorkoutItems.clear();
                 lastSuccessfulWorkoutItems.addAll(
-                        result.getData().stream().map(WorkoutDto::toDisplayString).collect(Collectors.toList())
+                        workouts.stream().map(WorkoutDto::toDisplayString).collect(Collectors.toList())
                 );
+                loadedWorkouts.clear();
+                loadedWorkouts.addAll(workouts);
+                updateChartFromData(workouts);
                 if (workoutItems.isEmpty()) showInfo(statusLabel, "Henüz antrenman kaydı yok");
                 updateWeeklyGoalsUI(Math.min(1.0, Math.max(0.2, workoutItems.size() / 6.0)));
             } else {
@@ -274,13 +282,52 @@ public class DashboardController extends BaseController {
 
     private void buildChart() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Dakika / Gün");
-        String[] days   = {"Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"};
-        int[]    values = {45, 60, 0, 90, 45, 120, 30};
-        for (int i = 0; i < days.length; i++) {
-            series.getData().add(new XYChart.Data<>(days[i], values[i]));
-        }
+        series.setName("Bu Hafta (dk)");
+        String[] days = {"Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"};
+        for (String d : days) series.getData().add(new XYChart.Data<>(d, 0));
         statisticsChart.getData().add(series);
+    }
+
+    private void updateChartFromData(List<WorkoutDto> workouts) {
+        LocalDate today     = LocalDate.now();
+        LocalDate weekStart = today.with(DayOfWeek.MONDAY);
+        int[] minutesByDay  = new int[7];
+        for (WorkoutDto w : workouts) {
+            if (w.getDate() == null || w.getDate().length() < 10) continue;
+            try {
+                LocalDate d = LocalDate.parse(w.getDate().substring(0, 10));
+                if (!d.isBefore(weekStart) && !d.isAfter(today)) {
+                    minutesByDay[d.getDayOfWeek().getValue() - 1] += w.getDurationInMinutes();
+                }
+            } catch (Exception ignored) {}
+        }
+        statisticsChart.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Bu Hafta (dk)");
+        String[] days = {"Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"};
+        for (int i = 0; i < 7; i++) series.getData().add(new XYChart.Data<>(days[i], minutesByDay[i]));
+        statisticsChart.getData().add(series);
+    }
+
+    private void openWorkoutDetail() {
+        int idx = workoutListView.getSelectionModel().getSelectedIndex();
+        if (idx < 0 || idx >= loadedWorkouts.size()) return;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/workout_detail.fxml"));
+            Parent root = loader.load();
+            WorkoutDetailController controller = loader.getController();
+            controller.setWorkout(loadedWorkouts.get(idx));
+            Stage modal = new Stage();
+            modal.setTitle("Antrenman Detayı");
+            modal.initModality(Modality.APPLICATION_MODAL);
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/css/dark-theme.css").toExternalForm());
+            modal.setScene(scene);
+            modal.setResizable(false);
+            modal.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void addProgressBar() {
