@@ -1,8 +1,53 @@
 # Mimari Dokümantasyon
 
-## Genel Yaklaşım
+## Genel Sistem Mimarisi
 
-SportTracker, birbirinden bağımsız çalışabilen mikroservislerden oluşur. Her servis kendi veritabanına sahiptir ve servisler arası doğrudan iletişim yoktur — tüm dış trafik API Gateway üzerinden geçer.
+```mermaid
+graph TB
+    subgraph Clients["İstemciler"]
+        DC["🖥️ Desktop Client<br/>(JavaFX)"]
+        MC["📱 Mobile Client<br/>(Gluon/JavaFX)"]
+    end
+
+    subgraph Gateway["API Katmanı"]
+        GW["API Gateway<br/>:8084<br/>(Spring Cloud Gateway)"]
+    end
+
+    subgraph Services["Mikroservisler"]
+        US["user-service<br/>:8081"]
+        WS["workout-service<br/>:8082"]
+        SS["statistics-service<br/>:8083"]
+    end
+
+    subgraph Databases["Veritabanları"]
+        MDB1[("MongoDB<br/>user_service_db")]
+        MDB2[("MongoDB<br/>workout_service_db")]
+        PG[("PostgreSQL<br/>sport_tracker_statistics")]
+        RD1[("Redis<br/>token cache")]
+        RD2[("Redis<br/>list cache")]
+    end
+
+    subgraph Shared["Ortak Kütüphane"]
+        SL["shared-library<br/>(DTO · JWT · Pattern · Wellness)"]
+    end
+
+    DC -->|HTTP + JWT| GW
+    MC -->|HTTP + JWT| GW
+    GW -->|/auth/**| US
+    GW -->|/api/v1/workouts/**| WS
+    GW -->|/api/v1/statistics/**| SS
+
+    US --- MDB1
+    US --- RD1
+    WS --- MDB2
+    WS --- RD2
+    SS --- PG
+
+    US -.->|Maven dep| SL
+    WS -.->|Maven dep| SL
+    SS -.->|Maven dep| SL
+    DC -.->|Maven dep| SL
+```
 
 ## Servis Sorumlulukları
 
@@ -40,13 +85,36 @@ Tüm servislerin ortak bağımlılığı. Maven `install` ile yerel repoya yükl
 ## Tasarım Kalıpları
 
 ### Factory Kalıbı
+
+```mermaid
+classDiagram
+    class CalorieStrategyFactory {
+        +getStrategy(intensity: String) CalorieCalculationStrategy
+    }
+    class CalorieCalculationStrategy {
+        <<interface>>
+        +calculate(durationMinutes: int) int
+    }
+    class LowIntensityStrategy {
+        +calculate(durationMinutes: int) int
+    }
+    class MediumIntensityStrategy {
+        +calculate(durationMinutes: int) int
+    }
+    class HighIntensityStrategy {
+        +calculate(durationMinutes: int) int
+    }
+    class DefaultIntensityStrategy {
+        +calculate(durationMinutes: int) int
+    }
+
+    CalorieStrategyFactory ..> CalorieCalculationStrategy : creates
+    CalorieCalculationStrategy <|.. LowIntensityStrategy
+    CalorieCalculationStrategy <|.. MediumIntensityStrategy
+    CalorieCalculationStrategy <|.. HighIntensityStrategy
+    CalorieCalculationStrategy <|.. DefaultIntensityStrategy
 ```
-CalorieStrategyFactory.getStrategy(intensity)
-    ├── "LOW"     → LowIntensityStrategy
-    ├── "MEDIUM"  → MediumIntensityStrategy
-    ├── "HIGH"    → HighIntensityStrategy
-    └── default   → DefaultIntensityStrategy
-```
+
 Masaüstü istemcide `WorkoutModalController` canlı kalori tahmini için kullanır.
 
 ### Strategy Kalıbı
@@ -57,31 +125,110 @@ public interface CalorieCalculationStrategy {
 ```
 Her strateji farklı MET katsayısıyla kalori hesaplar. Yeni şiddet türü eklemek için sadece yeni bir strateji sınıfı + factory kaydı yeterlidir; mevcut kod değişmez.
 
-## Veri Akışı
+## Veri Akışı (Sequence)
 
-```
-[Desktop/Mobile]
-      │
-      ▼  HTTP + JWT
-[API Gateway :8084]
-      │
-      ├──► [user-service :8081] ──► MongoDB (user_service_db)
-      │                         ──► Redis  (token cache)
-      │
-      ├──► [workout-service :8082] ──► MongoDB (workout_service_db)
-      │                           ──► Redis  (list cache)
-      │
-      └──► [statistics-service :8083] ──► PostgreSQL (sport_tracker_statistics)
+```mermaid
+sequenceDiagram
+    actor Kullanıcı
+    participant DC as Desktop Client
+    participant GW as API Gateway :8084
+    participant US as user-service :8081
+    participant WS as workout-service :8082
+    participant Redis
+    participant MongoDB
+
+    Kullanıcı->>DC: Giriş yap
+    DC->>GW: POST /auth/login
+    GW->>US: POST /auth/login
+    US->>MongoDB: findByEmail()
+    MongoDB-->>US: User
+    US->>Redis: cacheToken(userId, jwt)
+    US-->>GW: {token, userId}
+    GW-->>DC: {token, userId}
+
+    Kullanıcı->>DC: Antrenman ekle
+    DC->>GW: POST /api/v1/workouts [Bearer token]
+    GW->>WS: POST /api/v1/workouts
+    WS->>MongoDB: save(workout)
+    MongoDB-->>WS: savedWorkout
+    WS->>Redis: evict list cache
+    WS-->>GW: WorkoutDto
+    GW-->>DC: WorkoutDto
 ```
 
 ## Güvenlik Modeli
+
+```mermaid
+flowchart LR
+    A([İstek]) --> B{Token var mı?}
+    B -- Hayır --> C[401 Unauthorized]
+    B -- Evet --> D{Token geçerli mi?}
+    D -- Hayır --> E[403 Forbidden]
+    D -- Evet --> F[Downstream servise ilet]
+    F --> G([Yanıt])
+```
 
 1. Kullanıcı `/auth/login` ile JWT alır
 2. Tüm korumalı endpoint'ler `Authorization: Bearer <token>` header bekler
 3. API Gateway token'ı doğrular, geçerliyse downstream servise iletir
 4. Token süresi dolduğunda yeniden login gerekir
 
+## TDD Döngüsü
+
+```mermaid
+flowchart LR
+    R([🔴 RED\nTest yaz\nbdc6a3d]) --> G([🟢 GREEN\nKodu yaz\n2eca045])
+    G --> RF([🔵 REFACTOR\nİyileştir\n54e3422])
+    RF --> R2([🔴 RED\nYeni test\n3eb89bc])
+    R2 --> G2([🟢 GREEN\nİmplement\nc30818d])
+```
+
+Her servis için Red→Green→Refactor döngüsü commit geçmişinde tarih damgasıyla kanıtlanmıştır.
+
 ## Veritabanı Şemaları
+
+```mermaid
+erDiagram
+    USER {
+        string id PK
+        string username
+        string email
+        string password
+        string role
+        float weight
+        float height
+    }
+
+    WORKOUT {
+        string id PK
+        string userId FK
+        string name
+        string description
+        datetime date
+        int durationInMinutes
+    }
+
+    EXERCISE {
+        string id PK
+        string workoutId FK
+        string name
+        int sets
+        int reps
+        float weight
+    }
+
+    STATISTIC {
+        long id PK
+        string userId
+        string type
+        double value
+        datetime calculationDate
+    }
+
+    USER ||--o{ WORKOUT : "sahip"
+    WORKOUT ||--o{ EXERCISE : "içerir"
+    USER ||--o{ STATISTIC : "üretir"
+```
 
 Başlangıç scriptleri:
 - `database/mongodb/` — MongoDB koleksiyon ve index tanımları
