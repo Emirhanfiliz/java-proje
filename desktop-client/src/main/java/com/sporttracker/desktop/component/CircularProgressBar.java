@@ -17,17 +17,18 @@ public class CircularProgressBar extends StackPane {
     public CircularProgressBar(double radius, double strokeWidth) {
         Circle backgroundCircle = new Circle(radius);
         backgroundCircle.setFill(Color.TRANSPARENT);
-        backgroundCircle.setStroke(Color.LIGHTGRAY);
+        backgroundCircle.setStroke(Color.web("#1E2336"));
         backgroundCircle.setStrokeWidth(strokeWidth);
 
         progressArc = new Arc(0, 0, radius, radius, 90, 0);
         progressArc.setType(ArcType.OPEN);
         progressArc.setFill(Color.TRANSPARENT);
-        progressArc.setStroke(Color.web("#007bff"));
+        progressArc.setStroke(Color.web("#E8861A"));
         progressArc.setStrokeWidth(strokeWidth);
 
         progressText = new Text("0%");
         progressText.setFont(Font.font("System", FontWeight.BOLD, radius * 0.4));
+        progressText.setFill(Color.web("#F0F4FF"));
 
         getChildren().addAll(backgroundCircle, progressArc, progressText);
     }
@@ -42,11 +43,11 @@ public class CircularProgressBar extends StackPane {
         progressText.setText(String.format("%.0f%%", percentage));
 
         if (percentage < 40) {
-            progressArc.setStroke(Color.GREEN);
+            progressArc.setStroke(Color.web("#00C9A7"));
         } else if (percentage < 75) {
-            progressArc.setStroke(Color.ORANGE);
+            progressArc.setStroke(Color.web("#E8861A"));
         } else {
-            progressArc.setStroke(Color.RED);
+            progressArc.setStroke(Color.web("#F04438"));
         }
     }
 }
